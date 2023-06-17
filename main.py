@@ -19,6 +19,8 @@ while True:
         #print(lmList[4])
 
     cv2.imshow("Video",image)
-    cv2.waitKey(1)
-    cv2.destroyAllWindows()
+    if cv2.waitKey(1) != -1:
+        break
+
+cv2.destroyAllWindows()
  
