@@ -13,7 +13,11 @@ def letter_parser():
 #Austin is here
 #Aloha from William
 while True:
-    success, image = cap.read()
+    try:
+        success, image = cap.read()
+    except:
+        print("Camera not found")
+        break
     image = tracker.hands_finder(image)
     lmList = tracker.position_finder(image)
     tracker.letter_display(image, letter_parser())
