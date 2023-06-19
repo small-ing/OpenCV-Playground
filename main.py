@@ -20,7 +20,8 @@ while True:
         break
     image = tracker.hands_finder(image)
     lmList = tracker.position_finder(image)
-    tracker.letter_display(image, letter_parser())
+    tracker.update_letter()
+    tracker.letter_display(image, htm.stringOut_20,htm.stringOut_0)
     #if len(lmList) != 0:
         #print(lmList[4])
 

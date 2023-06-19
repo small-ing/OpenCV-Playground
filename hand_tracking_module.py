@@ -2,12 +2,7 @@
     #Programa visual de identificacion de manops al aire libre
 import cv2
 import mediapipe as mp
-idSelX_20 = 0
-idSelY_20 = 0
-idSelX_0 = 0
-idSelY_0 = 0
-stringOut_20 = ""
-stringOut_0 = ""
+
 class handTracker():
     def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
         self.mode = mode
@@ -18,6 +13,12 @@ class handTracker():
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands(self.mode, self.maxHands,self.modelComplex, self.detectionCon, self.trackCon)
         self.mpDraw = mp.solutions.drawing_utils
+        self.idSelX_20 = 0
+        self.idSelY_20 = 0
+        self.idSelX_0 = 0
+        self.idSelY_0 = 0
+        self.stringOut_20 = ""
+        self.stringOut_0 = ""
         
     def hands_finder(self,image,draw=True):
         imageRGB = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
@@ -39,16 +40,12 @@ class handTracker():
                 cx,cy = int(lm.x*w), int(lm.y*h)
                 lmlist.append([id,cx,cy])
             if id == 20 :
-                   global idSelX_20
-                   global idSelY_20
-                   idSelX_20 = cx
-                   idSelY_20 = cy
+                   self.idSelX_20 = cx
+                   self.idSelY_20 = cy
                    cv2.circle(image, (cx, cy), 25, (25, 255, 25), cv2.FILLED)  
             if id == 0 :
-                   global idSelX_0
-                   global idSelY_0
-                   idSelX_0 = cx
-                   idSelY_0 = cy
+                   self.idSelX_0 = cx
+                   self.idSelY_0 = cy
                    cv2.circle(image, (cx, cy), 25, (5, 255, 250), cv2.FILLED)         
                      
             if draw:
@@ -56,14 +53,18 @@ class handTracker():
 
         return lmlist
     
-    def letter_display(self, image, letter_20,letter_0, x=50, y=50):
+    def letter_display(self, image, letter=self.stringOut_20, x=50, y=50):
         # font
         font = cv2.FONT_HERSHEY_SIMPLEX
 
         # Using cv2.putText() method
         cv2.rectangle(image, (x-10, y+10), (x+300, y-100), (0,0,0), cv2.FILLED)
-        cv2.putText(image, letter_20, (x,y-25), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter, (x,y-25), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
+        # cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
+
+    def update_letter(self):
+        self.stringOut_20 = "ID_20Coord( " + str(idSelX_20) + "," + str(idSelY_20) + " )"
+        self.stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
 
 def main():
     cap = cv2.VideoCapture(0)
@@ -73,8 +74,8 @@ def main():
         success, image = cap.read()
         image = tracker.hands_finder(image)
         lmList = tracker.position_finder(image)
-        stringOut_20 = "ID_20Coord( " + str(idSelX_20) + "," + str(idSelY_20) + " )"
-        stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
+        tracker.update_letter()
+        # stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
         tracker.letter_display(image, stringOut_20,stringOut_0)
         #if len(lmList) != 0:
             #print(lmList[4])
