@@ -53,18 +53,19 @@ class handTracker():
 
         return lmlist
     
-    def letter_display(self, image, letter=self.stringOut_20, x=50, y=50):
+    def letter_display(self, image, letter="", x=50, y=50):
         # font
         font = cv2.FONT_HERSHEY_SIMPLEX
-
+        if letter == "":
+            letter = self.stringOut_20
         # Using cv2.putText() method
         cv2.rectangle(image, (x-10, y+10), (x+300, y-100), (0,0,0), cv2.FILLED)
         cv2.putText(image, letter, (x,y-25), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
         # cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
     def update_letter(self):
-        self.stringOut_20 = "ID_20Coord( " + str(idSelX_20) + "," + str(idSelY_20) + " )"
-        self.stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
+        self.stringOut_20 = "ID_20Coord( " + str(self.idSelX_20) + "," + str(self.idSelY_20) + " )"
+        self.stringOut_0 = "ID_0Coord( " + str(self.idSelX_0) + "," + str(self.idSelY_0) + " )"
 
 def main():
     cap = cv2.VideoCapture(0)
