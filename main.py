@@ -10,6 +10,7 @@ def letter_parser():
     letter = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     return letter
 
+# main loop
 while True:
     success, image = cap.read()
     image = tracker.hands_finder(image)
