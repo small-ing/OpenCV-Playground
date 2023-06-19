@@ -11,7 +11,7 @@ def letter_parser():
     return letter
 # brandon was here
 #Austin is here
-# main loop
+#Aloha from William
 while True:
     success, image = cap.read()
     image = tracker.hands_finder(image)
