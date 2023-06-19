@@ -2,7 +2,7 @@ import hand_tracking_module as htm
 import cv2
 import mediapipe as mp
 import random
-
+#Leo am exist
 cap = cv2.VideoCapture(0)
 tracker = htm.handTracker()
 
