@@ -10,6 +10,7 @@ def letter_parser():
     letter = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     return letter
 # brandon was here
+#Austin is here
 # main loop
 while True:
     success, image = cap.read()
