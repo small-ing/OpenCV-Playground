@@ -9,7 +9,7 @@ tracker = htm.handTracker()
 def letter_parser():
     letter = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     return letter
-# hello
+# hello from allen
 # main loop
 while True:
     success, image = cap.read()
