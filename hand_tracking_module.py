@@ -1,8 +1,15 @@
+
+    #Programa visual de identificacion de manops al aire libre
 import cv2
 import mediapipe as mp
-
+idSelX_20 = 0
+idSelY_20 = 0
+idSelX_0 = 0
+idSelY_0 = 0
+stringOut_20 = ""
+stringOut_0 = ""
 class handTracker():
-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
+    def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -24,25 +31,39 @@ class handTracker():
         return image
     
     def position_finder(self,image, handNo=0, draw=True):
-        lmlist = []
+        lmlist = [] # use list to create real time update coordinate list
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
             for id, lm in enumerate(Hand.landmark):
                 h,w,c = image.shape
                 cx,cy = int(lm.x*w), int(lm.y*h)
                 lmlist.append([id,cx,cy])
+            if id == 20 :
+                   global idSelX_20
+                   global idSelY_20
+                   idSelX_20 = cx
+                   idSelY_20 = cy
+                   cv2.circle(image, (cx, cy), 25, (25, 255, 25), cv2.FILLED)  
+            if id == 0 :
+                   global idSelX_0
+                   global idSelY_0
+                   idSelX_0 = cx
+                   idSelY_0 = cy
+                   cv2.circle(image, (cx, cy), 25, (5, 255, 250), cv2.FILLED)         
+                     
             if draw:
                 cv2.circle(image,(cx,cy), 15 , (255,0,255), cv2.FILLED)
 
         return lmlist
     
-    def letter_display(self, image, letter, x=50, y=50):
+    def letter_display(self, image, letter_20,letter_0, x=50, y=50):
         # font
         font = cv2.FONT_HERSHEY_SIMPLEX
 
         # Using cv2.putText() method
-        cv2.rectangle(image, (x-10, y+10), (x+50, y-50), (255,255,255), cv2.FILLED)
-        cv2.putText(image, letter, (x,y), font, 1, (0,0,0), 2, cv2.LINE_AA)
+        cv2.rectangle(image, (x-10, y+10), (x+300, y-100), (0,0,0), cv2.FILLED)
+        cv2.putText(image, letter_20, (x,y-25), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
 def main():
     cap = cv2.VideoCapture(0)
@@ -52,13 +73,15 @@ def main():
         success, image = cap.read()
         image = tracker.hands_finder(image)
         lmList = tracker.position_finder(image)
-        tracker.letter_display(image, "A")
+        stringOut_20 = "ID_20Coord( " + str(idSelX_20) + "," + str(idSelY_20) + " )"
+        stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
+        tracker.letter_display(image, stringOut_20,stringOut_0)
         #if len(lmList) != 0:
             #print(lmList[4])
-
+      
         cv2.imshow("Video",image)
-        cv2.waitKey(1)
-        cv2.destroyAllWindows()
+        cv2.waitKey(2)
+        # cv2.destroyAllWindows() # killer of cpu
 
 if __name__ == "__main__":
     main()
