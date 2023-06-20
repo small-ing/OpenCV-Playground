@@ -42,7 +42,10 @@ def collect_data(batch_size=10, offset=0):
     return empty_marks
 
 def main():
-    print(len(collect_data(1, 951)[10][:]))
+    train = collect_data(900)
+    test = collect_data(100, 900)
+
+    
 
 
 
