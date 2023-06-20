@@ -77,7 +77,7 @@ def main():
         lmList = tracker.position_finder(image)
         tracker.update_letter()
         # stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
-        tracker.letter_display(image, stringOut_20,stringOut_0)
+        tracker.letter_display(image, tracker.stringOut_20,tracker.stringOut_0)
         #if len(lmList) != 0:
             #print(lmList[4])
       
