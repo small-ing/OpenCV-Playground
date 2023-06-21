@@ -23,13 +23,10 @@ def collect_data(batch_size=26, offset=0):
     letter_batch = int(letter_batch)
 
     for letter in alphabet:
-        #print("starting " + letter  + " batch")
         offset = offset // 26
         for index in range(offset, offset+letter_batch):
-            #print("starting " + letter + " " + str(index))
             total_index = index + alphabet.index(letter)*letter_batch
             empty_labels[total_index-offset] = alphabet.index(letter)
-            
             zero_fill = ""
             if index < 10:
                 zero_fill = "00000"
@@ -39,24 +36,17 @@ def collect_data(batch_size=26, offset=0):
                 zero_fill = "000"
             if index < 10000 and index >= 1000: 
                 zero_fill = "00"
-
             try:
                 with open(os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json")) as file:
                     data = json.load(file)
-                    
                     try:
                         assert letter == data["Letter"]
                     except AssertionError:
                         print("Letter mismatch: " + letter + " != " + data["Letter"] + "in File " + os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json"))
-                    
                     for joint in range(26): # splits original joints into new joints  
                         if landmark_map[joint] != None: # checks if joint is in new landmark map
-                            #print("Landmark: " + str(joint) + " " + str(landmark_map[joint]))
-                            #print("Total Index: " + str(total_index))
-                            #print(empty_marks[total_index-offset][landmark_map[joint]])
                             if empty_marks[total_index-offset][landmark_map[joint]][0] == 0 and empty_marks[total_index-offset][landmark_map[joint]][1] == 0:
                                 empty_marks[total_index-offset][landmark_map[joint]] = data["Landmarks"][joint]
-                                #print("Total Index: " + str(total_index))
                             else: # break everything if there is already a value
                                 assert 1 + 1 == 3
 
@@ -120,17 +110,6 @@ class CNN(torch.nn.Module):
         out = self.fc2(out)
         return out
 
-# def create_model():
-#     m = nn.Sequential(
-#             torch.nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
-#             torch.nn.ReLU(),
-#             torch.nn.MaxPool2d(kernel_size=2, stride=2),
-#             torch.nn.Dropout(p=1)
-    
-    
-#     )
-#     print(m)
-#     return m
 
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, img, label):
@@ -145,18 +124,11 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
     should_save = False
     for i in range(epochs):
         for img, label in train_loader:
-            #print(img.shape)
-            #print(label.shape)
             img = img.to(device)
             img = img.to(torch.float)
-            label = label.to(device)
-            
+            label = label.to(device) 
             pred = model(img)
-            #print("Prediction: " + str(pred))
-            #print("Actual: " + str(label))
-
             loss = loss_fn(pred, label)
-            #print(loss)
 
             optimizer.zero_grad()    
             loss.backward()
@@ -164,7 +136,6 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         test_images = test_images.to(torch.float).to(device)
         pred = model(test_images)
         digit = torch.argmax(pred, dim=1)
-        # print(test_labels)
         test_labels = test_labels.to(device)
         acc = torch.sum(digit == test_labels)/len(test_labels)
         if acc > 0.2:
@@ -172,13 +143,7 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
 
-def test_model(model, test_images, test_labels):
-    test_images = test_images.to(torch.float).to(device)
-    pred = model(test_images)
-    digit = torch.argmax(pred, dim=1)
-    test_labels = test_labels.to(device)
-    acc = torch.sum(digit == test_labels)/len(test_labels)
-    print(f"Test accuracy: {acc}")
+
 
 def main():
     train_data, train_labels = collect_data(26000)
@@ -203,15 +168,13 @@ def main():
     model = CNN()
 
 
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.0005)
     criteron = nn.CrossEntropyLoss()
 
     model.to(device)
     if train_model(model, train_loader, criteron, optimizer, 100, test_data, test_labels):
         torch.save(model, "asl_cnn_model.pth")
         torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
-        # torch.load("model.pth")
-
 
 
 

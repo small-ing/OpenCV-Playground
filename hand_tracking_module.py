@@ -21,7 +21,7 @@ class handTracker():
         self.idSelY_0 = 0
         self.stringOut_20 = ""
         self.stringOut_0 = ""
-        self.landmark_tensor = torch.zeros(1, 21, 2)
+        self.landmark_tensor = torch.zeros(1, 1, 21, 2)
         self.asl_model = torch.load("asl_cnn_model.pth")
         self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights.pth"))
         self.asl_model.eval()
@@ -45,8 +45,8 @@ class handTracker():
                 h,w,c = image.shape
                 cx,cy = int(lm.x*w), int(lm.y*h)
                 lmlist.append([id,cx,cy])
-                self.landmark_tensor[0][id][0] = cx
-                self.landmark_tensor[0][id][1] = cy
+                self.landmark_tensor[0][0][id][0] = cx / 1280
+                self.landmark_tensor[0][0][id][1] = cy / 720
                 
             if id == 20 :
                    self.idSelX_20 = cx
