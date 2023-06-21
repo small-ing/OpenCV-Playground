@@ -72,7 +72,6 @@ def normalize_data(data):
     return data
 
 class CNN(torch.nn.Module):
-
     def __init__(self):
         super(CNN, self).__init__()
         keep_prob = 0.5
@@ -86,15 +85,15 @@ class CNN(torch.nn.Module):
             torch.nn.Dropout(p=1 - keep_prob))
         # L2 ImgIn shape=(?, 10, 1, 32)
         # Conv      ->(?, 10, 1, 64)
-        # Pool      ->(?, 7, 7, 64)
+        # Pool      ->(?, 5, 0, 64)
         self.layer2 = torch.nn.Sequential(
             torch.nn.Conv2d(32, 128, kernel_size=3, stride=1, padding=1),
             torch.nn.ReLU(),
             #torch.nn.MaxPool2d(kernel_size=2, stride=2),
             torch.nn.Dropout(p=1 - keep_prob))
         # L3 ImgIn shape=(?, 7, 7, 64)
-        # Conv ->(?, 7, 7, 128)
-        # Pool ->(?, 4, 4, 128)
+        # Conv ->(?, 5, 0, 128)
+        # Pool ->(?, 2, 0, 128)
         self.layer3 = torch.nn.Sequential(
             torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
             torch.nn.ReLU(),
@@ -182,8 +181,8 @@ def test_model(model, test_images, test_labels):
     print(f"Test accuracy: {acc}")
 
 def main():
-    train_data, train_labels = collect_data(2340)
-    test_data, test_labels = collect_data(260, 2340)
+    train_data, train_labels = collect_data(26000)
+    test_data, test_labels = collect_data(2600, 23400)
 
     train_data = torch.from_numpy(train_data)
     train_data = normalize_data(train_data)
@@ -208,8 +207,9 @@ def main():
     criteron = nn.CrossEntropyLoss()
 
     model.to(device)
-    train_model(model, train_loader, criteron, optimizer, 8, test_data, test_labels)
-        # torch.save(model, "model.pth")
+    if train_model(model, train_loader, criteron, optimizer, 100, test_data, test_labels):
+        torch.save(model, "asl_cnn_model.pth")
+        torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
         # torch.load("model.pth")
 
 

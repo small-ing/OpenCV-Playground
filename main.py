@@ -21,7 +21,7 @@ while True:
     image = tracker.hands_finder(image)
     lmList = tracker.position_finder(image)
     tracker.update_letter()
-    tracker.letter_display(image)
+    tracker.letter_display(image,letter=tracker.estimate_letter())
     #if len(lmList) != 0:
         #print(lmList[4])
 

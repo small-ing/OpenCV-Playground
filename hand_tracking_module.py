@@ -22,6 +22,9 @@ class handTracker():
         self.stringOut_20 = ""
         self.stringOut_0 = ""
         self.landmark_tensor = torch.zeros(1, 21, 2)
+        self.asl_model = torch.load("asl_cnn_model.pth")
+        self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights.pth"))
+        self.asl_model.eval()
         
     def hands_finder(self,image,draw=True):
         imageRGB = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
@@ -75,7 +78,9 @@ class handTracker():
         self.stringOut_0 = "ID_0Coord( " + str(self.idSelX_0) + "," + str(self.idSelY_0) + " )"
 
     def estimate_letter(self):
-        pass
+        alphabet = "abcdefghijklmnopqrstuvwxyz"
+        letter = alphabet[torch.argmax(self.asl_model(self.landmark_tensor))]
+        return letter
 
 
 def main():
