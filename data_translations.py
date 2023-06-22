@@ -13,45 +13,41 @@ import matplotlib.pyplot as plt
 
 #                0    1    2   3  4  5  6    7   8  9   10  11   12   13  14  15  16   17   18  19  20  21  22 23 24 25
 landmark_map = [None, 0, None, 5, 6, 7, 8, None, 9, 10, 11, 12, None, 17, 18, 19, 20, None, 13, 14, 15, 16, 1, 2, 3, 4]
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-def collect_data(batch_size=26, offset=0):
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+alphabet = "abcdefghiklmnopqrstuvwxy"
+
+def collect_data(batch_size=24, offset=0):
     empty_marks = np.zeros((batch_size, 21, 2))
     empty_labels = np.zeros((batch_size))
-    letter_batch = batch_size / 26
+    letter_batch = batch_size / 24
     letter_batch = int(letter_batch)
 
     for letter in alphabet:
-        offset = offset // 26
-        for index in range(offset, offset+letter_batch):
-            total_index = index + alphabet.index(letter)*letter_batch
-            empty_labels[total_index-offset] = alphabet.index(letter)
-            zero_fill = ""
-            if index < 10:
-                zero_fill = "00000"
-            if index < 100 and index >= 10:
-                zero_fill = "0000"
-            if index < 1000 and index >= 100:
-                zero_fill = "000"
-            if index < 10000 and index >= 1000: 
-                zero_fill = "00"
-            try:
-                with open(os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json")) as file:
-                    data = json.load(file)
-                    try:
-                        assert letter == data["Letter"]
-                    except AssertionError:
-                        print("Letter mismatch: " + letter + " != " + data["Letter"] + "in File " + os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json"))
-                    for joint in range(26): # splits original joints into new joints  
-                        if landmark_map[joint] != None: # checks if joint is in new landmark map
-                            if empty_marks[total_index-offset][landmark_map[joint]][0] == 0 and empty_marks[total_index-offset][landmark_map[joint]][1] == 0:
-                                empty_marks[total_index-offset][landmark_map[joint]] = data["Landmarks"][joint]
-                            else: # break everything if there is already a value
-                                assert 1 + 1 == 3
+        offset = offset // 24
+        if letter == "z" or letter == "j":
+            pass
+        else:
+            for index in range(offset, offset+letter_batch):
+                total_index = index + alphabet.index(letter)*letter_batch
+                empty_labels[total_index-offset] = alphabet.index(letter)
 
-            except FileNotFoundError:
-                print("File not found: " + os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json"))
+                try:
+                    with open(os.path.join("data", letter + "_annotation", '{0:06d}'.format(index) + ".json")) as file:
+                        data = json.load(file)
+                        try:
+                            assert letter == data["Letter"]
+                        except AssertionError:
+                            print("Letter mismatch: " + letter + " != " + data["Letter"] + "in File " + os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json"))
+                        for joint in range(26): # splits original joints into new joints  
+                            if landmark_map[joint] != None: # checks if joint is in new landmark map
+                                if empty_marks[total_index-offset][landmark_map[joint]][0] == 0 and empty_marks[total_index-offset][landmark_map[joint]][1] == 0:
+                                    empty_marks[total_index-offset][landmark_map[joint]] = data["Landmarks"][joint]
+                                else: # break everything if there is already a value
+                                    assert False
+
+                except FileNotFoundError:
+                    print("File not found: " + os.path.join("data", letter + "_annotation", '{0:06d}'.format(index) + str(index) + ".json"))
     return empty_marks, empty_labels.astype(int)
 
 def normalize_data(data):
@@ -95,10 +91,11 @@ class CNN(torch.nn.Module):
         torch.nn.init.xavier_uniform_(self.fc1.weight)
         self.layer4 = torch.nn.Sequential(
             self.fc1,
+            torch.nn.Linear(625, 625, bias=True),
             torch.nn.ReLU(),
             torch.nn.Dropout(p=1 - keep_prob))
         # L5 Final FC 625 inputs -> 10 outputs
-        self.fc2 = torch.nn.Linear(625, 26, bias=True)
+        self.fc2 = torch.nn.Linear(625, 24, bias=True)
         torch.nn.init.xavier_uniform_(self.fc2.weight) # initialize parameters
 
     def forward(self, x):
@@ -138,16 +135,20 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         digit = torch.argmax(pred, dim=1)
         test_labels = test_labels.to(device)
         acc = torch.sum(digit == test_labels)/len(test_labels)
-        if acc > 0.2:
+        if acc > 0.9 and loss < 0.15:
             should_save = True
+            if acc > 0.91 and loss < 0.04:
+                break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
 
 
 
 def main():
-    train_data, train_labels = collect_data(26000)
-    test_data, test_labels = collect_data(2600, 23400)
+    train_data, train_labels = collect_data(24000)
+    test_data, test_labels = collect_data(2400, 21600)
+    print(train_data.shape)
+    print(train_labels.shape)
 
     train_data = torch.from_numpy(train_data)
     train_data = normalize_data(train_data)
@@ -158,17 +159,16 @@ def main():
     print(train_data.shape)
     print(train_labels.shape)
     train_data = train_data.reshape(-1, 1, 21, 2)
-    print(train_data.shape)
+    # print(train_data.shape)
     test_data = test_data.reshape(-1, 1, 21, 2)
     
     train_data = train_data.float()
     train_dataset = ImageDataset(train_data, train_labels)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=130, shuffle=True, num_workers=1)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=130, shuffle=True, num_workers=2)
 
     model = CNN()
 
-
-    optimizer = optim.Adam(model.parameters(), lr=0.0005)
+    optimizer = optim.Adam(model.parameters(), lr=0.00075, weight_decay=1e-5)
     criteron = nn.CrossEntropyLoss()
 
     model.to(device)

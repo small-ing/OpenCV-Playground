@@ -1,5 +1,3 @@
-
-    #Programa visual de identificacion de manops al aire libre
 import cv2
 import mediapipe as mp
 from data_translations import *
@@ -21,6 +19,7 @@ class handTracker():
         self.idSelY_0 = 0
         self.stringOut_20 = ""
         self.stringOut_0 = ""
+        
         self.landmark_tensor = torch.zeros(1, 1, 21, 2)
         self.asl_model = torch.load("asl_cnn_model.pth")
         self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights.pth"))
@@ -37,7 +36,7 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
     
-    def position_finder(self,image, handNo=0, draw=True):
+    def position_finder(self, image, handNo=0, draw=True):
         lmlist = [] # use list to create real time update coordinate list
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
@@ -62,14 +61,17 @@ class handTracker():
 
         return lmlist
     
-    def letter_display(self, image, letter="", x=50, y=50):
+    def letter_display(self, image, letter="", x=25, y=50):
         # font
         font = cv2.FONT_HERSHEY_SIMPLEX
-        if letter == "":
-            letter = self.stringOut_20
         # Using cv2.putText() method
-        cv2.rectangle(image, (x-10, y+10), (x+300, y-100), (0,0,0), cv2.FILLED)
-        cv2.putText(image, letter, (x,y-25), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
+        #cv2.rectangle(image, (x-10, y-50), (x+400, y+150), (0,0,0), cv2.FILLED)
+        cv2.putText(image, "I think it's " + letter[0], (x,y-25), font, 0.75, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, "But it could instead be:", (x,y), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[1], (x+12,y+25), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[2], (x+12,y+45), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[3], (x+12,y+60), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[4], (x+12,y+75), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
         #cv2.putText(image, str(self.landmark_tensor), (x,y+500), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
         # cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
@@ -78,9 +80,15 @@ class handTracker():
         self.stringOut_0 = "ID_0Coord( " + str(self.idSelX_0) + "," + str(self.idSelY_0) + " )"
 
     def estimate_letter(self):
-        alphabet = "abcdefghijklmnopqrstuvwxyz"
-        letter = alphabet[torch.argmax(self.asl_model(self.landmark_tensor))]
-        return letter
+        alphabet = "abcdefghiklmnopqrstuvwxy"
+        letters = torch.topk(self.asl_model(self.landmark_tensor), 5).indices.tolist()[0]
+        confidence = torch.topk(self.asl_model(self.landmark_tensor), 5).values.tolist()[0]
+        #print(letters)
+        #print(confidence)
+        letters = [alphabet[i] for i in letters]
+        for i in range(len(letters)):
+            letters[i] = letters[i] + " " + str(round(confidence[i], 2)) + "%"
+        return letters
 
 
 def main():

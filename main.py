@@ -1,8 +1,9 @@
 import hand_tracking_module as htm
 import cv2
-import mediapipe as mp
 from data_translations import *
+
 cap = cv2.VideoCapture(0)
+
 tracker = htm.handTracker()
 
 #Leo am exist
@@ -20,7 +21,7 @@ while True:
     lmList = tracker.position_finder(image)
     tracker.update_letter()
     letter=tracker.estimate_letter()
-    print(letter)
+    #print(letter)
     tracker.letter_display(image,letter=letter)
 
     cv2.imshow("Video",image)
