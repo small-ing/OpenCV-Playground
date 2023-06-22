@@ -27,17 +27,9 @@ def collect_data(batch_size=26, offset=0):
         for index in range(offset, offset+letter_batch):
             total_index = index + alphabet.index(letter)*letter_batch
             empty_labels[total_index-offset] = alphabet.index(letter)
-            zero_fill = ""
-            if index < 10:
-                zero_fill = "00000"
-            if index < 100 and index >= 10:
-                zero_fill = "0000"
-            if index < 1000 and index >= 100:
-                zero_fill = "000"
-            if index < 10000 and index >= 1000: 
-                zero_fill = "00"
+
             try:
-                with open(os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json")) as file:
+                with open(os.path.join("data", letter + "_annotation", '{0:06d}'.format(index) + ".json")) as file:
                     data = json.load(file)
                     try:
                         assert letter == data["Letter"]
@@ -48,7 +40,7 @@ def collect_data(batch_size=26, offset=0):
                             if empty_marks[total_index-offset][landmark_map[joint]][0] == 0 and empty_marks[total_index-offset][landmark_map[joint]][1] == 0:
                                 empty_marks[total_index-offset][landmark_map[joint]] = data["Landmarks"][joint]
                             else: # break everything if there is already a value
-                                assert 1 + 1 == 3
+                                assert False
 
             except FileNotFoundError:
                 print("File not found: " + os.path.join("data", letter + "_annotation", zero_fill + str(index) + ".json"))
@@ -172,7 +164,7 @@ def main():
     criteron = nn.CrossEntropyLoss()
 
     model.to(device)
-    if train_model(model, train_loader, criteron, optimizer, 100, test_data, test_labels):
+    if train_model(model, train_loader, criteron, optimizer, 50, test_data, test_labels):
         torch.save(model, "asl_cnn_model.pth")
         torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
 
