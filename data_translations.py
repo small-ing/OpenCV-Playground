@@ -135,7 +135,7 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         digit = torch.argmax(pred, dim=1)
         test_labels = test_labels.to(device)
         acc = torch.sum(digit == test_labels)/len(test_labels)
-        if acc > 0.9 and loss < 0.1:
+        if acc > 0.9 and loss < 0.15:
             should_save = True
             if acc > 0.91 and loss < 0.04:
                 break
