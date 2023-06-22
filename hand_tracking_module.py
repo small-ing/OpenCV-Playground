@@ -66,10 +66,12 @@ class handTracker():
         font = cv2.FONT_HERSHEY_SIMPLEX
         # Using cv2.putText() method
         #cv2.rectangle(image, (x-10, y-50), (x+400, y+150), (0,0,0), cv2.FILLED)
-        cv2.putText(image, "I think it's " + letter[0], (x,y-25), font, 0.5, (255,255,255), 3, cv2.LINE_AA)
-        cv2.putText(image, "But it could instead be:", (x,y), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter[1], (x+12,y+25), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter[2], (x+12,y+45), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, "I think it's " + letter[0], (x,y-25), font, 0.75, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, "But it could instead be:", (x,y), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[1], (x+12,y+25), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[2], (x+12,y+45), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[3], (x+12,y+60), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[4], (x+12,y+75), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
         #cv2.putText(image, str(self.landmark_tensor), (x,y+500), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
         # cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
@@ -79,9 +81,13 @@ class handTracker():
 
     def estimate_letter(self):
         alphabet = "abcdefghijklmnopqrstuvwxyz"
-        letters = torch.topk(self.asl_model(self.landmark_tensor), 3).indices.tolist()[0]
+        letters = torch.topk(self.asl_model(self.landmark_tensor), 5).indices.tolist()[0]
+        confidence = torch.topk(self.asl_model(self.landmark_tensor), 5).values.tolist()[0]
         #print(letters)
+        #print(confidence)
         letters = [alphabet[i] for i in letters]
+        for i in range(len(letters)):
+            letters[i] = letters[i] + " " + str(round(confidence[i], 2)) + "%"
         return letters
 
 
