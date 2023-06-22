@@ -1,8 +1,9 @@
 import hand_tracking_module as htm
 import cv2
-import mediapipe as mp
 from data_translations import *
+
 cap = cv2.VideoCapture(0)
+
 tracker = htm.handTracker()
 
 #Leo am exist

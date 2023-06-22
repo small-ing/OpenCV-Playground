@@ -1,5 +1,3 @@
-
-    #Programa visual de identificacion de manops al aire libre
 import cv2
 import mediapipe as mp
 from data_translations import *
@@ -21,6 +19,7 @@ class handTracker():
         self.idSelY_0 = 0
         self.stringOut_20 = ""
         self.stringOut_0 = ""
+        
         self.landmark_tensor = torch.zeros(1, 1, 21, 2)
         self.asl_model = torch.load("asl_cnn_model.pth")
         self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights.pth"))
@@ -37,7 +36,7 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
     
-    def position_finder(self,image, handNo=0, draw=True):
+    def position_finder(self, image, handNo=0, draw=True):
         lmlist = [] # use list to create real time update coordinate list
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
