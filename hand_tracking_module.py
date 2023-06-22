@@ -80,7 +80,7 @@ class handTracker():
         self.stringOut_0 = "ID_0Coord( " + str(self.idSelX_0) + "," + str(self.idSelY_0) + " )"
 
     def estimate_letter(self):
-        alphabet = "abcdefghijklmnopqrstuvwxyz"
+        alphabet = "abcdefghiklmnopqrstuvwxy"
         letters = torch.topk(self.asl_model(self.landmark_tensor), 5).indices.tolist()[0]
         confidence = torch.topk(self.asl_model(self.landmark_tensor), 5).values.tolist()[0]
         #print(letters)
