@@ -49,30 +49,21 @@ class handTracker():
         return tensor_return
 
     def position_finder(self, image, handNo=0, draw=True):
-        lmlist = [] # use list to create real time update coordinate list
         if self.results.multi_hand_landmarks:
             Hand = self.results.multi_hand_landmarks[handNo]
             for id, lm in enumerate(Hand.landmark):
                 h,w,c = image.shape
                 cx,cy = int(lm.x*w), int(lm.y*h)
-                lmlist.append([id,cx,cy])
                 self.landmark_tensor[0][0][id][0] = cx
                 self.landmark_tensor[0][0][id][1] = cy
+                if id == 20 and draw:
+                    cv2.circle(image, (cx, cy), 15, (25, 255, 25), cv2.FILLED)  
+                if id == 0 and draw:
+                    cv2.circle(image, (cx, cy), 15, (5, 255, 250), cv2.FILLED)
             self.landmark_tensor = self.normalize_hand(self.landmark_tensor)
                 
-            if id == 20 :
-                   self.idSelX_20 = cx
-                   self.idSelY_20 = cy
-                   cv2.circle(image, (cx, cy), 25, (25, 255, 25), cv2.FILLED)  
-            if id == 0 :
-                   self.idSelX_0 = cx
-                   self.idSelY_0 = cy
-                   cv2.circle(image, (cx, cy), 25, (5, 255, 250), cv2.FILLED)         
-                     
             if draw:
-                cv2.circle(image,(cx,cy), 15 , (255,0,255), cv2.FILLED)
-
-        return lmlist
+                cv2.circle(image,(cx,cy), 5 , (255,0,255), cv2.FILLED)
     
     def letter_display(self, image, letter="", x=25, y=50):
         # font
