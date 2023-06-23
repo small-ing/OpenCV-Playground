@@ -51,11 +51,19 @@ def collect_data(batch_size=24, offset=0):
     return empty_marks, empty_labels.astype(int)
 
 def normalize_data(data):
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            data[i][j][0] = data[i][j][0] / 640
-            data[i][j][1] = data[i][j][1] / 480 
-    return data
+  tensor_return = torch.zeros(data.shape)  
+  for i in range(len(data)): # ASL Letters iterated
+    for j in range(1, 21): # 1-20 nodes iterated
+      zero_node = data[i][0] # saves 0 node before changes
+      #print(zero_node)
+      for k in range(2): # x/y iteration
+        if k == 0:
+            tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 640
+        if k == 1:
+            tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 540
+      tensor_return[i][0][0] = 0 # reset zero node x
+      tensor_return[i][0][1] = 0 # reset zero node y
+  return tensor_return
 
 class CNN(torch.nn.Module):
     def __init__(self):
@@ -135,7 +143,7 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         digit = torch.argmax(pred, dim=1)
         test_labels = test_labels.to(device)
         acc = torch.sum(digit == test_labels)/len(test_labels)
-        if acc > 0.9 and loss < 0.1:
+        if acc > 0.9 and loss < 0.15:
             should_save = True
             if acc > 0.91 and loss < 0.04:
                 break
@@ -156,6 +164,10 @@ def main():
     test_data = normalize_data(test_data)
     train_labels = torch.from_numpy(train_labels)
     test_labels = torch.from_numpy(test_labels)
+    train_labels = train_labels.long()
+    test_labels = test_labels.long()
+
+
     print(train_data.shape)
     print(train_labels.shape)
     train_data = train_data.reshape(-1, 1, 21, 2)

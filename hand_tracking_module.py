@@ -36,6 +36,21 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
     
+    def normalize_data(data):
+        tensor_return = torch.zeros(data.shape)  
+        for i in range(len(data)): # ASL Letters iterated
+            for j in range(1, 21): # 1-20 nodes iterated
+                zero_node = data[i][0] # saves 0 node before changes
+                #print(zero_node)
+                for k in range(2): # x/y iteration
+                    if k == 0:
+                        tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 640
+                    if k == 1:
+                        tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 540
+                tensor_return[i][0][0] = 0 # reset zero node x
+                tensor_return[i][0][1] = 0 # reset zero node y
+        return tensor_return
+
     def position_finder(self, image, handNo=0, draw=True):
         lmlist = [] # use list to create real time update coordinate list
         if self.results.multi_hand_landmarks:
@@ -44,8 +59,9 @@ class handTracker():
                 h,w,c = image.shape
                 cx,cy = int(lm.x*w), int(lm.y*h)
                 lmlist.append([id,cx,cy])
-                self.landmark_tensor[0][0][id][0] = cx / 1280
-                self.landmark_tensor[0][0][id][1] = cy / 720
+                self.landmark_tensor[0][0][id][0] = cx
+                self.landmark_tensor[0][0][id][1] = cy
+            self.landmark_tensor = normalize_data(self.landmark_tensor)
                 
             if id == 20 :
                    self.idSelX_20 = cx
