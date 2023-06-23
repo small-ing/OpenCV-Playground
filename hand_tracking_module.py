@@ -36,19 +36,16 @@ class handTracker():
                     self.mpDraw.draw_landmarks(image, handLms, self.mpHands.HAND_CONNECTIONS)
         return image
     
-    def normalize_data(data):
-        tensor_return = torch.zeros(data.shape)  
-        for i in range(len(data)): # ASL Letters iterated
-            for j in range(1, 21): # 1-20 nodes iterated
-                zero_node = data[i][0] # saves 0 node before changes
-                #print(zero_node)
-                for k in range(2): # x/y iteration
-                    if k == 0:
-                        tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 640
-                    if k == 1:
-                        tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 540
-                tensor_return[i][0][0] = 0 # reset zero node x
-                tensor_return[i][0][1] = 0 # reset zero node y
+    def normalize_hand(self, data):
+        tensor_return = torch.zeros(data.shape)
+        zero_node = data[0][0][0] # saves 0 node before changes
+        for j in range(1, 21): # 1-20 nodes iterated
+            joint = data[0][0][j]
+            tensor_return[0][0][j][0] = (zero_node[0] - joint[0]) / 640
+            tensor_return[0][0][j][1] = (zero_node[1] - joint[1]) / 360
+        tensor_return[0][0][0][0] = 0 # reset zero node x
+        tensor_return[0][0][0][1] = 0 # reset zero node y
+        print(tensor_return)
         return tensor_return
 
     def position_finder(self, image, handNo=0, draw=True):
@@ -61,7 +58,7 @@ class handTracker():
                 lmlist.append([id,cx,cy])
                 self.landmark_tensor[0][0][id][0] = cx
                 self.landmark_tensor[0][0][id][1] = cy
-            self.landmark_tensor = normalize_data(self.landmark_tensor)
+            self.landmark_tensor = self.normalize_hand(self.landmark_tensor)
                 
             if id == 20 :
                    self.idSelX_20 = cx
@@ -110,20 +107,23 @@ class handTracker():
 def main():
     cap = cv2.VideoCapture(0)
     tracker = handTracker()
-
     while True:
-        success, image = cap.read()
+        try:
+            success, image = cap.read()
+        except:
+            print("Camera not found")
+            break
+
         image = tracker.hands_finder(image)
         lmList = tracker.position_finder(image)
         tracker.update_letter()
-        # stringOut_0 = "ID_0Coord( " + str(idSelX_0) + "," + str(idSelY_0) + " )"
-        tracker.letter_display(image, tracker.stringOut_20,tracker.stringOut_0)
-        #if len(lmList) != 0:
-            #print(lmList[4])
-      
+        letter=tracker.estimate_letter()
+        #print(letter)
+        tracker.letter_display(image,letter=letter)
+
         cv2.imshow("Video",image)
-        cv2.waitKey(2)
-        # cv2.destroyAllWindows() # killer of cpu
+        if cv2.waitKey(1) != -1:
+            break
 
 if __name__ == "__main__":
     main()

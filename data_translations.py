@@ -51,19 +51,19 @@ def collect_data(batch_size=24, offset=0):
     return empty_marks, empty_labels.astype(int)
 
 def normalize_data(data):
-  tensor_return = torch.zeros(data.shape)  
-  for i in range(len(data)): # ASL Letters iterated
-    for j in range(1, 21): # 1-20 nodes iterated
-      zero_node = data[i][0] # saves 0 node before changes
-      #print(zero_node)
-      for k in range(2): # x/y iteration
-        if k == 0:
-            tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 640
-        if k == 1:
-            tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 540
-      tensor_return[i][0][0] = 0 # reset zero node x
-      tensor_return[i][0][1] = 0 # reset zero node y
-  return tensor_return
+    tensor_return = torch.zeros(data.shape)  
+    for i in range(len(data)): # ASL Letters iterated
+        for j in range(1, 21): # 1-20 nodes iterated
+            zero_node = data[i][0] # saves 0 node before changes
+            #print(zero_node)
+            for k in range(2): # x/y iteration
+                if k == 0:
+                    tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 320
+                if k == 1:
+                    tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 270
+            tensor_return[i][0][0] = 0 # reset zero node x
+            tensor_return[i][0][1] = 0 # reset zero node y
+    return tensor_return
 
 class CNN(torch.nn.Module):
     def __init__(self):
@@ -145,7 +145,7 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         acc = torch.sum(digit == test_labels)/len(test_labels)
         if acc > 0.9 and loss < 0.15:
             should_save = True
-            if acc > 0.91 and loss < 0.04:
+            if acc > 0.925 and loss < 0.04:
                 break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
@@ -155,34 +155,39 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
 def main():
     train_data, train_labels = collect_data(24000)
     test_data, test_labels = collect_data(2400, 21600)
-    print(train_data.shape)
-    print(train_labels.shape)
+    
+    print("Successfully collected data")
 
     train_data = torch.from_numpy(train_data)
     train_data = normalize_data(train_data)
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
+    
+    print("Successfully normalized data")
+    
     train_labels = torch.from_numpy(train_labels)
     test_labels = torch.from_numpy(test_labels)
     train_labels = train_labels.long()
     test_labels = test_labels.long()
 
-
-    print(train_data.shape)
-    print(train_labels.shape)
     train_data = train_data.reshape(-1, 1, 21, 2)
-    # print(train_data.shape)
     test_data = test_data.reshape(-1, 1, 21, 2)
-    
     train_data = train_data.float()
+
+    print("Successfully converted to tensors")
+    
     train_dataset = ImageDataset(train_data, train_labels)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=130, shuffle=True, num_workers=2)
 
+    print("Successfully created dataset")
+    
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.00075, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=0.00085, weight_decay=1e-6)
     criteron = nn.CrossEntropyLoss()
 
+    print("Successfully created model")
+    
     model.to(device)
     if train_model(model, train_loader, criteron, optimizer, 100, test_data, test_labels):
         torch.save(model, "asl_cnn_model.pth")
