@@ -145,7 +145,7 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         acc = torch.sum(digit == test_labels)/len(test_labels)
         if acc > 0.9 and loss < 0.15:
             should_save = True
-            if acc > 0.925 and loss < 0.04:
+            if acc > 0.925 and loss < 0.07:
                 break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
@@ -183,13 +183,13 @@ def main():
     
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.00085, weight_decay=1e-6)
+    optimizer = optim.Adam(model.parameters(), lr=0.00015, weight_decay=1e-6)
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
     
     model.to(device)
-    if train_model(model, train_loader, criteron, optimizer, 100, test_data, test_labels):
+    if train_model(model, train_loader, criteron, optimizer, 500, test_data, test_labels):
         torch.save(model, "asl_cnn_model.pth")
         torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
 

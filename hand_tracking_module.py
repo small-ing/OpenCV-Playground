@@ -45,7 +45,7 @@ class handTracker():
             tensor_return[0][0][j][1] = (zero_node[1] - joint[1]) / 360
         tensor_return[0][0][0][0] = 0 # reset zero node x
         tensor_return[0][0][0][1] = 0 # reset zero node y
-        print(tensor_return)
+        #print(tensor_return)
         return tensor_return
 
     def position_finder(self, image, handNo=0, draw=True):
