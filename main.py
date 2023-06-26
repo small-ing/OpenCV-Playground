@@ -4,7 +4,7 @@ from data_translations import *
 
 cap = cv2.VideoCapture(0)
 
-tracker = htm.handTracker()
+tracker = htm.handTracker(asl=True)
 
 #Leo am exist
 # brandon was here
