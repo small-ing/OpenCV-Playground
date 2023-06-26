@@ -34,7 +34,7 @@ def collect_train_files():
                     labels[j] = ord(i) - ord("A") + 1
                 else:
                     errors += 1
-            print("iteration: " + str(j), "errors: " + str(errors))
+            #print("iteration: " + str(j), "errors: " + str(errors))
             j += 1
     return landmarks, labels, errors
         
@@ -66,7 +66,7 @@ def main():
 
     
     #print(len(labels))
-    print("Training Errors: " + str(train_errors))
+    print( "Training Errors: " + str(train_errors) + "out of " + str(len(train_labels)) + " images")
     #print(j - errors)
 
     print("Successfully created tensors")
@@ -79,7 +79,10 @@ def main():
     train_loader = torch.utils.data.DataLoader(dataset, batch_size=130, shuffle=True, num_workers=0)
     print("Successfully created dataset")
 
-    dt.train_model(model, train_loader, criteron, optimizer, 10, test_landmarks, test_labels)
+    if dt.train_model(model, train_loader, criteron, optimizer, 200, test_landmarks, test_labels):
+        torch.save(model, "asl_cnn_bulk_model.pth")
+        torch.save(model.state_dict(), "asl_cnn_bulk_model_weights.pth")
+    
 
 # Iterate through all the images in the folder
 # For each image, run the hand tracking module
