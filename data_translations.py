@@ -1,6 +1,8 @@
 import json
 import os
 import numpy as np
+import bulk_image_trainer as bit
+from bulk_image_trainer import *
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -61,6 +63,21 @@ def normalize_data(data):
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 320
                 if k == 1:
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 270
+            tensor_return[i][0][0] = 0 # reset zero node x
+            tensor_return[i][0][1] = 0 # reset zero node y
+    return tensor_return
+
+def normalize_image_data(data):
+    tensor_return = torch.zeros(data.shape)  
+    for i in range(len(data)): # ASL Letters iterated
+        for j in range(1, 21): # 1-20 nodes iterated
+            zero_node = data[i][0] # saves 0 node before changes
+            #print(zero_node)
+            for k in range(2): # x/y iteration
+                if k == 0:
+                    tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 100
+                if k == 1:
+                    tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 100
             tensor_return[i][0][0] = 0 # reset zero node x
             tensor_return[i][0][1] = 0 # reset zero node y
     return tensor_return
@@ -157,7 +174,14 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
 
 def main():
     train_data, train_labels = collect_data(24000)
+    train_more_data, train_more_labels = bit.collect_train_files()
+    temp = train_labels.view(-1)
+    zero_index = len(temp.nonzero())
+    train_more_labels = train_more_labels[:zero_index]
+    train_more_labels = train_more_labels.long()
+    train_more_landmarks = train_more_landmarks[:zero_index]
     test_data, test_labels = collect_data(2400, 21600)
+    test_more_data, test_more_labels = bit.collect_test_files(train_more_data, train_more_labels)
     
     print("Successfully collected data")
 
@@ -165,14 +189,22 @@ def main():
     train_data = normalize_data(train_data)
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
+    train_more_data = normalize_data(train_more_data)
+    test_more_data = normalize_data(test_more_data)
     
     print("Successfully normalized data")
+    
+    train_data = torch.cat((train_data, train_more_data), 0)
+    test_data = torch.cat((test_data, test_more_data), 0)
     
     train_labels = torch.from_numpy(train_labels)
     test_labels = torch.from_numpy(test_labels)
     train_labels = train_labels.long()
     test_labels = test_labels.long()
 
+    train_labels = torch.cat((train_labels, train_more_labels), 0)
+    test_labels = torch.cat((test_labels, test_more_labels), 0)
+    
     train_data = train_data.reshape(-1, 1, 21, 2)
     test_data = test_data.reshape(-1, 1, 21, 2)
     train_data = train_data.float()

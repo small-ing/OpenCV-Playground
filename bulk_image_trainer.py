@@ -18,6 +18,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #print(os.listdir("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train"))
 # if you have the images locally, you should only need /asl_alphabet_train
 def collect_train_files():
+    landmarks = torch.zeros(87000, 1, 21, 2)
+    labels = torch.zeros(87000)
     j = 0
     errors = 0
     for i in "ABCDEFGHIKLMNOPQRSTUVWXY":
