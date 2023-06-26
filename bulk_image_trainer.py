@@ -21,6 +21,7 @@ def collect_train_files():
     landmarks = torch.zeros(87000, 1, 21, 2)
     labels = torch.zeros(87000)
     j = 0
+    work = 0
     errors = 0
     for i in "ABCDEFGHIKLMNOPQRSTUVWXY":
         print("Current Letter is " + i)
@@ -35,9 +36,20 @@ def collect_train_files():
                     landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                     labels[j] = ord(i) - ord("A") + 1
                 else:
-                    errors += 1
+                    #print("retrying")
+                    fileObject = cv2.cvtColor(numpy.array(fileObject), cv2.COLOR_BGR2RGB)
+                    tracker.hands_finder(fileObject, False)
+                    hand_landmarks = tracker.results.multi_hand_landmarks
+                    if hand_landmarks is not None:
+                        hand_landmarks = hand_landmarks[0]
+                        landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                        labels[j] = ord(i) - ord("A") + 1
+                        work += 1
+                    else:
+                        errors += 1
             #print("iteration: " + str(j), "errors: " + str(errors))
             j += 1
+    print("retrying help with " + str(work) + " images")
     return landmarks, labels, errors
         
 def collect_test_files(train_landmarks, train_labels, num_files=100):

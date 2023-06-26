@@ -11,6 +11,7 @@ import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 import torch.nn.init
 import matplotlib.pyplot as plt
+import time
 
 
 #                0    1    2   3  4  5  6    7   8  9   10  11   12   13  14  15  16   17   18  19  20  21  22 23 24 25
@@ -163,7 +164,7 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         if acc > 0.9 and loss < 0.15:
             print("Good enough to save")
             should_save = True
-            if acc > 0.925 and loss < 0.07:
+            if acc > 0.97 and loss < 0.05:
                 print(f"Accuracy - {acc} and Loss - {loss} are ideal")
                 print("Model Ideal, saving now...")
                 break
@@ -173,8 +174,13 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
 
 
 def main():
+    print("Starting...")
+    start_time = time.time()
+    print(start_time)
     train_data, train_labels = collect_data(24000)
+    print("Collected JSON Data")
     train_more_data, train_more_labels = bit.collect_train_files()
+    print("Collected Image Data")
     temp = train_labels.view(-1)
     zero_index = len(temp.nonzero())
     train_more_labels = train_more_labels[:zero_index]
@@ -183,14 +189,15 @@ def main():
     test_data, test_labels = collect_data(2400, 21600)
     test_more_data, test_more_labels = bit.collect_test_files(train_more_data, train_more_labels)
     
-    print("Successfully collected data")
-
+    print("Successfully collected all data")
+    print("Time Elapsed: ", time.time() - start_time)
+    
     train_data = torch.from_numpy(train_data)
     train_data = normalize_data(train_data)
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
-    train_more_data = normalize_data(train_more_data)
-    test_more_data = normalize_data(test_more_data)
+    train_more_data = normalize_image_data(train_more_data)
+    test_more_data = normalize_image_data(test_more_data)
     
     print("Successfully normalized data")
     
@@ -222,11 +229,13 @@ def main():
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
+    print("Time Elapsed: ", time.time() - start_time)
     
     model.to(device)
     if train_model(model, train_loader, criteron, optimizer, 500, test_data, test_labels):
         torch.save(model, "asl_cnn_model.pth")
         torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
+    print("Total Time Elapsed: ", time.time() - start_time)
 
 
 
