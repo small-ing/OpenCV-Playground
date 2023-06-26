@@ -1,10 +1,9 @@
 import cv2
 import mediapipe as mp
-from data_translations import *
 import torch
 
 class handTracker():
-    def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
+    def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5,asl=False):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -19,11 +18,11 @@ class handTracker():
         self.idSelY_0 = 0
         self.stringOut_20 = ""
         self.stringOut_0 = ""
-        
         self.landmark_tensor = torch.zeros(1, 1, 21, 2)
-        self.asl_model = torch.load("asl_cnn_model_fin.pth")
-        self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights_fin.pth"))
-        self.asl_model.eval()
+        if asl:
+            self.asl_model = torch.load("asl_cnn_model_fin.pth")
+            self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights_fin.pth"))
+            self.asl_model.eval()
         
     def hands_finder(self,image,draw=True):
         imageRGB = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
