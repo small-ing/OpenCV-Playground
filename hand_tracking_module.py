@@ -4,7 +4,7 @@ from data_translations import *
 import torch
 
 class handTracker():
-    def __init__(self, mode=False, maxHands=2, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
+    def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5):
         self.mode = mode
         self.maxHands = maxHands
         self.detectionCon = detectionCon
@@ -69,13 +69,13 @@ class handTracker():
         # font
         font = cv2.FONT_HERSHEY_SIMPLEX
         # Using cv2.putText() method
-        #cv2.rectangle(image, (x-10, y-50), (x+400, y+150), (0,0,0), cv2.FILLED)
-        cv2.putText(image, "I think it's " + letter[0], (x,y-25), font, 0.75, (255,255,255), 2, cv2.LINE_AA)
+        cv2.rectangle(image, (x-10, y-50), (x+250, y+95), (0,0,0), cv2.FILLED)
+        cv2.putText(image, "I think it's " + letter[0], (x,y-25), font, 0.7, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(image, "But it could instead be:", (x,y), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter[1], (x+12,y+25), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter[2], (x+12,y+45), font, 0.6, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter[3], (x+12,y+60), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(image, letter[4], (x+12,y+75), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[1], (x+12,y+25), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[2], (x+12,y+45), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[3], (x+12,y+65), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(image, letter[4], (x+12,y+85), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
         #cv2.putText(image, str(self.landmark_tensor), (x,y+500), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
         # cv2.putText(image, letter_0, (x,y+100), font, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
