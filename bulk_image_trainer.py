@@ -9,11 +9,13 @@ import time
 from PIL import Image
 import string
 from sklearn.preprocessing import LabelEncoder
+
 landmarks = torch.zeros(87000, 1, 21, 2)
 labels = torch.zeros(87000, 1)
 tracker = handTracker()
 alphabetList = "ABCDEFGHIKLMNOPQRSTUVWXY"
 alphabetList = "A"
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 j = 0
 errors = 0
@@ -42,6 +44,7 @@ print(j - errors)
 
 print(j)
 model = CNN()
+model.to(device)
 criteron = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0005, weight_decay=0.00001)
 dataset = ImageDataset(landmarks, labels)
