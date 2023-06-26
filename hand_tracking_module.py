@@ -1,6 +1,5 @@
 import cv2
 import mediapipe as mp
-from data_translations import *
 import torch
 
 class handTracker():

@@ -1,16 +1,16 @@
 import json
 import os
 import numpy as np
-import bulk_image_trainer as bit
-from bulk_image_trainer import *
+from PIL import Image
+import cv2
+from hand_tracking_module import handTracker
+import random
+# import bulk_image_trainer as bit
+# from bulk_image_trainer import collect_train_files, collect_test_files
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.autograd import Variable
-import torchvision.datasets as dsets
-import torchvision.transforms as transforms
 import torch.nn.init
-import matplotlib.pyplot as plt
 import time
 
 
@@ -18,6 +18,7 @@ import time
 landmark_map = [None, 0, None, 5, 6, 7, 8, None, 9, 10, 11, 12, None, 17, 18, 19, 20, None, 13, 14, 15, 16, 1, 2, 3, 4]
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+tracker = handTracker()
 alphabet = "abcdefghiklmnopqrstuvwxy"
 
 def collect_data(batch_size=24, offset=0):
@@ -82,6 +83,52 @@ def normalize_image_data(data):
             tensor_return[i][0][0] = 0 # reset zero node x
             tensor_return[i][0][1] = 0 # reset zero node y
     return tensor_return
+
+def collect_train_files():
+    landmarks = torch.zeros(87000, 1, 21, 2)
+    labels = torch.zeros(87000)
+    j = 0
+    work = 0
+    errors = 0
+    for i in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        print("Current Letter is " + i)
+        files = os.listdir("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i)
+        for file_name in files:
+            with Image.open("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i + "/" + file_name) as fileObject:
+                fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
+                tracker.hands_finder(fileObject, False)
+                hand_landmarks = tracker.results.multi_hand_landmarks
+                if hand_landmarks is not None:
+                    hand_landmarks = hand_landmarks[0]
+                    landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                    labels[j] = ord(i) - ord("A") + 1
+                else:
+                    #print("retrying")
+                    fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
+                    tracker.hands_finder(fileObject, False)
+                    hand_landmarks = tracker.results.multi_hand_landmarks
+                    if hand_landmarks is not None:
+                        hand_landmarks = hand_landmarks[0]
+                        landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                        labels[j] = ord(i) - ord("A") + 1
+                        work += 1
+                    else:
+                        errors += 1
+            #print("iteration: " + str(j), "errors: " + str(errors))
+            j += 1
+    print("retrying helped with " + str(work) + " images")
+    return landmarks, labels, errors
+        
+def collect_test_files(train_landmarks, train_labels, num_files=100):
+    landmarks = torch.zeros(num_files, 1, 21, 2)
+    labels = torch.zeros(num_files)
+    
+    for idx in range(num_files):
+        random_idx = random.randint(0, len(train_landmarks) - 1)
+        landmarks[idx] = train_landmarks[random_idx]
+        labels[idx] = train_labels[random_idx]
+        
+    return landmarks, labels
 
 class CNN(torch.nn.Module):
     def __init__(self):
@@ -179,18 +226,21 @@ def main():
     print(start_time)
     train_data, train_labels = collect_data(24000)
     print("Collected JSON Data")
-    train_more_data, train_more_labels = bit.collect_train_files()
+    bit_time = time.time()
+    train_more_data, train_more_labels, errors = collect_train_files()
+    print("There were ", errors, " errors in collecting the image data")
+    print("It took ", (time.time() - bit_time)/60, " minutes to collect the image data")
     print("Collected Image Data")
-    temp = train_labels.view(-1)
+    temp = train_more_labels.view(-1)
     zero_index = len(temp.nonzero())
     train_more_labels = train_more_labels[:zero_index]
     train_more_labels = train_more_labels.long()
     train_more_landmarks = train_more_landmarks[:zero_index]
     test_data, test_labels = collect_data(2400, 21600)
-    test_more_data, test_more_labels = bit.collect_test_files(train_more_data, train_more_labels)
+    test_more_data, test_more_labels = collect_test_files(train_more_data, train_more_labels)
     
     print("Successfully collected all data")
-    print("Time Elapsed: ", time.time() - start_time)
+    print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
     
     train_data = torch.from_numpy(train_data)
     train_data = normalize_data(train_data)
@@ -229,13 +279,13 @@ def main():
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
-    print("Time Elapsed: ", time.time() - start_time)
+    print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
     
     model.to(device)
     if train_model(model, train_loader, criteron, optimizer, 500, test_data, test_labels):
         torch.save(model, "asl_cnn_model.pth")
         torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
-    print("Total Time Elapsed: ", time.time() - start_time)
+    print("Total Time Elapsed: ", (time.time() - start_time)/60, " minutes")
 
 
 
