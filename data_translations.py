@@ -144,8 +144,11 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         test_labels = test_labels.to(device)
         acc = torch.sum(digit == test_labels)/len(test_labels)
         if acc > 0.9 and loss < 0.15:
+            print("Good enough to save")
             should_save = True
             if acc > 0.925 and loss < 0.07:
+                print(f"Accuracy - {acc} and Loss - {loss} are ideal")
+                print("Model Ideal, saving now...")
                 break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
