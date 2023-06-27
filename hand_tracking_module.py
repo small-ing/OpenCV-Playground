@@ -77,3 +77,53 @@ class handTracker():
         for i in range(len(letters)):
             letters[i] = letters[i] + " " + str(round(confidence[i], 2)) + "%"
         return letters
+
+class CNN(torch.nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        keep_prob = 0.5
+        # L1 ImgIn shape=(?, 21, 2, 1)
+        # Conv -> (?, 21, 2, 32)
+        # Pool -> (?, 10, 1, 32)
+        self.layer1 = torch.nn.Sequential(
+            torch.nn.Conv2d(1, 32, kernel_size=2, stride=1, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=2, stride=2),
+            torch.nn.Dropout(p=1 - keep_prob))
+        # L2 ImgIn shape=(?, 10, 1, 32)
+        # Conv      ->(?, 10, 1, 64)
+        # Pool      ->(?, 5, 0, 64)
+        self.layer2 = torch.nn.Sequential(
+            torch.nn.Conv2d(32, 128, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            #torch.nn.MaxPool2d(kernel_size=2, stride=2),
+            torch.nn.Dropout(p=1 - keep_prob))
+        # L3 ImgIn shape=(?, 7, 7, 64)
+        # Conv ->(?, 5, 0, 128)
+        # Pool ->(?, 2, 0, 128)
+        self.layer3 = torch.nn.Sequential(
+            torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            #torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=1),
+            torch.nn.Dropout(p=1 - keep_prob))
+
+        # L4 FC 4x4x128 inputs -> 625 outputs
+        self.fc1 = torch.nn.Linear(1408, 625, bias=True)
+        torch.nn.init.xavier_uniform_(self.fc1.weight)
+        self.layer4 = torch.nn.Sequential(
+            self.fc1,
+            torch.nn.Linear(625, 625, bias=True),
+            torch.nn.ReLU(),
+            torch.nn.Dropout(p=1 - keep_prob))
+        # L5 Final FC 625 inputs -> 10 outputs
+        self.fc2 = torch.nn.Linear(625, 24, bias=True)
+        torch.nn.init.xavier_uniform_(self.fc2.weight) # initialize parameters
+
+    def forward(self, x):
+        out = self.layer1(x)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = out.view(out.size(0), -1)   # Flatten them for FC
+        out = self.fc1(out)
+        out = self.fc2(out)
+        return out

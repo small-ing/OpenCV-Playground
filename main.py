@@ -1,6 +1,6 @@
+from hand_tracking_module import handTracker, CNN
 import hand_tracking_module as htm
 import cv2
-from data_translations import CNN
 
 cap = cv2.VideoCapture(0)
 
