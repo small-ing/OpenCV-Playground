@@ -64,8 +64,6 @@ def bio():
 def demo():
     global switch, cap, wireframe
     if request.method == 'POST':
-        print(request.method)
-        print(request.form)
         if request.form.get('stop') == 'Start or Stop Video':
             print("Flipping switch")
             if(switch==1):

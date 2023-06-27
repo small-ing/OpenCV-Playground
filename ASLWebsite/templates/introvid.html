@@ -3,8 +3,47 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../static/css/mainStyling.css">
 </head>
 <body>
+    <style>
+        .nav-links {
+          display: flex;
+          justify-content: right;
+          align-items: center;
+        }
+        
+        .nav-links .separator {
+          margin: 2.5px; /* Adjust the spacing around the separator */
+          color: gray; /* Separator color */
+          font-size: 1rem; /* Adjust the separator size */
+          line-height: 1;
+          display: flex;
+          align-items: center;
+        }
+        </style>
+        <style>
+            .darkgray {
+              background-color: #333333;
+              color: #ffffff;
+            }
+        </style>
+        <style>
+            .darkergray {
+              background-color: #111111;
+              color: #ffffff;
+            }
+        </style>
+          <!-- NAVIGATION MENU -->
+        <div class="darkergray nav-links topnav">
+          <a href="/">Home</a>
+          <span class="separator">|</span>
+          <a href="/bio">About</a>
+          <span class="separator">|</span>
+          <a href="/intro">How It Works</a>
+          <span class="separator">|</span>
+          <a href="/demo">ASL Translator</a>
+        </div>
 <header class="bg-primary text-center py-5 mb-4">
     <div class="container">
         <h1 class="fw-light text-white">About the Project</h1>
