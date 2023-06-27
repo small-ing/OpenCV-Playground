@@ -27,6 +27,7 @@ def get_base_url(port:int) -> str:
 
 # to exit flask app
 # ctrl + c
+
 port = 5000
 base_url = get_base_url(port)
 
