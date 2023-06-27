@@ -127,7 +127,7 @@ def collect_test_files(train_landmarks, train_labels, num_files=100):
     
     for idx in range(num_files):
         random_idx = random.randint(0, len(train_landmarks) - 1)
-        landmarks[0][idx] = train_landmarks[0][random_idx]
+        landmarks[idx][0] = train_landmarks[random_idx]
         labels[idx] = train_labels[random_idx]
         
     return landmarks, labels
@@ -280,7 +280,7 @@ def main():
     
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.00015, weight_decay=1e-6)
+    optimizer = optim.Adam(model.parameters(), lr=0.0002, weight_decay=1e-5)
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
