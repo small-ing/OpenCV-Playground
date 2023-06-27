@@ -41,5 +41,9 @@ def index():
 def bio():
     return render_template("bio.html")
 
+@app.route(f"{base_url}/demo/")
+def demo():
+    return render_template("demo.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
