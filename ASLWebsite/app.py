@@ -2,13 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Res
 import json
 import os
 import cv2
-<<<<<<< Updated upstream
-from hand_tracking_module import handTracker
-from data_translations import CNN
-=======
 from hand_tracking_module import handTracker, CNN
 import hand_tracking_module as htm
->>>>>>> Stashed changes
 
 def get_base_url(port:int) -> str:
     '''
@@ -64,8 +59,6 @@ def bio():
 # Demo Project
 @app.route(f"{base_url}/demo/")
 def demo():
-<<<<<<< Updated upstream
-=======
     global switch, cap
     if request.method == 'POST':
         if  request.form.get('stop') == 'Start or Stop Video':
@@ -79,7 +72,6 @@ def demo():
     
     elif request.method == 'GET':
         return render_template("demo.html")
->>>>>>> Stashed changes
     return render_template("demo.html")
 
 @app.route(f"{base_url}/video_feed/")
