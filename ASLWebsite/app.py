@@ -48,7 +48,7 @@ def index():
 # Introduction Video + How to Use
 @app.route(f"{base_url}/intro/")
 def intro():
-    return render_template("intro.html")
+    return render_template("introvid.html")
 
 # About Us
 @app.route(f"{base_url}/bio/")
