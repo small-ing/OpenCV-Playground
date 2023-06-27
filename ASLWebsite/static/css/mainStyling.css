@@ -28,3 +28,7 @@
   background-color: #2b5ea0;
   color: white;
 }
+.navbar-brand img {
+  max-width: auto;
+  height: 150%;
+}
