@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Res
 import json
 import os
 import cv2
-from hand_tracking_module import handTracker
-from data_translations import CNN
+#from hand_tracking_module import handTracker
+#from data_translations import CNN
 
 def get_base_url(port:int) -> str:
     '''
@@ -56,9 +56,15 @@ def bio():
     return render_template("bio.html")
 
 # Demo Project
-@app.route(f"{base_url}/demo/")
+@app.route(f"{base_url}/demo/", methods=['GET', 'POST'])
 def demo():
+    if request.method == 'POST':
+        pass
+    
+    elif request.method == 'GET':
+        return render_template("demo.html")
     return render_template("demo.html")
+    
 
 @app.route(f"{base_url}/video_feed/")
 def video_feed():
@@ -87,9 +93,6 @@ def gen_frames():
         except:
             print("Camera not found")
             break
-
-
-
     
 
 if __name__ == "__main__":
