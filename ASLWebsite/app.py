@@ -38,11 +38,11 @@ def index():
     print("Loading Home Page...")
     return render_template("main.html")
 
-@app.route(f"{base_url}/bio/")
+@app.route(f"{base_url}/bio")
 def bio():
     return render_template("bio.html")
 
-@app.route(f"{base_url}/demo/")
+@app.route(f"{base_url}/demo")
 def demo():
     return render_template("demo.html")
 
