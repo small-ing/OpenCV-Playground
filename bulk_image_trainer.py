@@ -10,7 +10,7 @@ import random
 import numpy
 from PIL import Image
 
-landmarks = torch.zeros(87000, 1, 21, 2)
+landmarks = torch.zeros(87000, 21, 2)
 labels = torch.zeros(87000)
 tracker = htm.handTracker()
 #alphabetList = "ABCDEFGHIKLMNOPQRSTUVWXY"
@@ -19,7 +19,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #print(os.listdir("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train"))
 # if you have the images locally, you should only need /asl_alphabet_train
 def collect_train_files():
-    landmarks = torch.zeros(87000, 1, 21, 2)
+    landmarks = torch.zeros(87000, 21, 2)
     labels = torch.zeros(87000)
     j = 0
     work = 0
@@ -34,7 +34,7 @@ def collect_train_files():
                 hand_landmarks = tracker.results.multi_hand_landmarks
                 if hand_landmarks is not None:
                     hand_landmarks = hand_landmarks[0]
-                    landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                    landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                     labels[j] = ord(i) - ord("A") + 1
                 else:
                     #print("retrying")
@@ -43,7 +43,7 @@ def collect_train_files():
                     hand_landmarks = tracker.results.multi_hand_landmarks
                     if hand_landmarks is not None:
                         hand_landmarks = hand_landmarks[0]
-                        landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                        landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                         labels[j] = ord(i) - ord("A") + 1
                         work += 1
                     else:
@@ -54,7 +54,7 @@ def collect_train_files():
     return landmarks, labels, errors
         
 def collect_test_files(train_landmarks, train_labels, num_files=100):
-    landmarks = torch.zeros(num_files, 1, 21, 2)
+    landmarks = torch.zeros(num_files, 21, 2)
     labels = torch.zeros(num_files)
     
     for idx in range(num_files):

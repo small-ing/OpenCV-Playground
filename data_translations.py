@@ -56,6 +56,7 @@ def collect_data(batch_size=24, offset=0):
 
 def normalize_data(data):
     tensor_return = torch.zeros(data.shape)  
+    #print(tensor_return.shape)
     for i in range(len(data)): # ASL Letters iterated
         for j in range(1, 21): # 1-20 nodes iterated
             zero_node = data[i][0] # saves 0 node before changes
@@ -70,11 +71,12 @@ def normalize_data(data):
     return tensor_return
 
 def normalize_image_data(data):
-    tensor_return = torch.zeros(data.shape)  
+    tensor_return = torch.zeros(data.shape)
+    # print(tensor_return.shape)
     for i in range(len(data)): # ASL Letters iterated
         for j in range(1, 21): # 1-20 nodes iterated
             zero_node = data[i][0] # saves 0 node before changes
-            #print(zero_node)
+            # print(zero_node)
             for k in range(2): # x/y iteration
                 if k == 0:
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / 100
@@ -85,12 +87,12 @@ def normalize_image_data(data):
     return tensor_return
 
 def collect_train_files():
-    landmarks = torch.zeros(87000, 1, 21, 2)
-    labels = torch.zeros(87000)
+    landmarks = torch.zeros(80000, 21, 2)
+    labels = torch.zeros(80000)
     j = 0
     work = 0
     errors = 0
-    for i in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+    for i in "ABCDEFGHIKLMNOPQRSTUVWXY":
         print("Current Letter is " + i)
         files = os.listdir("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i)
         for file_name in files:
@@ -100,7 +102,7 @@ def collect_train_files():
                 hand_landmarks = tracker.results.multi_hand_landmarks
                 if hand_landmarks is not None:
                     hand_landmarks = hand_landmarks[0]
-                    landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                    landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                     labels[j] = ord(i) - ord("A") + 1
                 else:
                     #print("retrying")
@@ -109,18 +111,18 @@ def collect_train_files():
                     hand_landmarks = tracker.results.multi_hand_landmarks
                     if hand_landmarks is not None:
                         hand_landmarks = hand_landmarks[0]
-                        landmarks[j][0] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                        landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                         labels[j] = ord(i) - ord("A") + 1
                         work += 1
                     else:
                         errors += 1
-            #print("iteration: " + str(j), "errors: " + str(errors))
+            # print("iteration: " + str(j), "errors: " + str(errors))
             j += 1
     print("retrying helped with " + str(work) + " images")
     return landmarks, labels, errors
         
 def collect_test_files(train_landmarks, train_labels, num_files=100):
-    landmarks = torch.zeros(num_files, 1, 21, 2)
+    landmarks = torch.zeros(num_files, 21, 2)
     labels = torch.zeros(num_files)
     
     for idx in range(num_files):
@@ -231,13 +233,16 @@ def main():
     print("There were ", errors, " errors in collecting the image data")
     print("It took ", (time.time() - bit_time)/60, " minutes to collect the image data")
     print("Collected Image Data")
+    print("normal now")
     temp = train_more_labels.view(-1)
     zero_index = len(temp.nonzero())
     train_more_labels = train_more_labels[:zero_index]
     train_more_labels = train_more_labels.long()
-    train_more_landmarks = train_more_landmarks[:zero_index]
+    train_more_data = train_more_data[:zero_index]
+    train_more_data = train_more_data.reshape(-1, 1, 21, 2)
     test_data, test_labels = collect_data(2400, 21600)
     test_more_data, test_more_labels = collect_test_files(train_more_data, train_more_labels)
+    test_more_data = test_more_data
     
     print("Successfully collected all data")
     print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
@@ -247,7 +252,8 @@ def main():
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
     train_more_data = normalize_image_data(train_more_data)
-    test_more_data = normalize_image_data(test_more_data)
+    train_data = train_data.reshape(-1, 1, 21, 2)
+    test_data = test_data.reshape(-1, 1, 21, 2)
     
     print("Successfully normalized data")
     
@@ -262,8 +268,6 @@ def main():
     train_labels = torch.cat((train_labels, train_more_labels), 0)
     test_labels = torch.cat((test_labels, test_more_labels), 0)
     
-    train_data = train_data.reshape(-1, 1, 21, 2)
-    test_data = test_data.reshape(-1, 1, 21, 2)
     train_data = train_data.float()
 
     print("Successfully converted to tensors")
