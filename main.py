@@ -1,6 +1,6 @@
 import hand_tracking_module as htm
 import cv2
-from data_translations import *
+from data_translations import CNN
 
 cap = cv2.VideoCapture(0)
 
@@ -19,7 +19,6 @@ while True:
 
     image = tracker.hands_finder(image)
     lmList = tracker.position_finder(image)
-    tracker.update_letter()
     letter=tracker.estimate_letter()
     tracker.letter_display(image,letter=letter)
 

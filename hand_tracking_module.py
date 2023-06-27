@@ -15,8 +15,8 @@ class handTracker():
 
         self.landmark_tensor = torch.zeros(1, 1, 21, 2)
         if asl:
-            self.asl_model = torch.load("asl_cnn_model.pth")
-            self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights.pth"))
+            self.asl_model = torch.load("asl_cnn_model_fincom.pth")
+            self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights_fincom.pth"))
             self.asl_model.eval()
         
     def hands_finder(self,image,draw=True):
