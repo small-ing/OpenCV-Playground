@@ -93,7 +93,7 @@ def collect_train_files():
     work = 0
     errors = 0
     for i in "ABCDEFGHIKLMNOPQRSTUVWXY":
-        print("Current Letter is " + i)
+        print("    Current Letter is " + i)
         files = os.listdir("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i)
         for file_name in files:
             with Image.open("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i + "/" + file_name) as fileObject:
@@ -122,12 +122,12 @@ def collect_train_files():
     return landmarks, labels, errors
         
 def collect_test_files(train_landmarks, train_labels, num_files=100):
-    landmarks = torch.zeros(num_files, 21, 2)
+    landmarks = torch.zeros(num_files, 1, 21, 2)
     labels = torch.zeros(num_files)
     
     for idx in range(num_files):
         random_idx = random.randint(0, len(train_landmarks) - 1)
-        landmarks[idx] = train_landmarks[random_idx]
+        landmarks[0][idx] = train_landmarks[0][random_idx]
         labels[idx] = train_labels[random_idx]
         
     return landmarks, labels
@@ -213,9 +213,9 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
         if acc > 0.9 and loss < 0.15:
             print("Good enough to save")
             should_save = True
-            if acc > 0.97 and loss < 0.05:
+            if acc > 0.98 and loss < 0.05:
                 print(f"Accuracy - {acc} and Loss - {loss} are ideal")
-                print("Model Ideal, saving now...")
+                print("Model is Ideal, saving now...")
                 break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
@@ -225,10 +225,11 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
 def main():
     print("Starting...")
     start_time = time.time()
-    print(start_time)
+    #print(start_time)
     train_data, train_labels = collect_data(24000)
     print("Collected JSON Data")
     bit_time = time.time()
+    print("Collecting Image Data...")
     train_more_data, train_more_labels, errors = collect_train_files()
     print("There were ", errors, " errors in collecting the image data")
     print("It took ", (time.time() - bit_time)/60, " minutes to collect the image data")
@@ -249,7 +250,7 @@ def main():
     train_data = normalize_data(train_data)
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
-    print(train_more_data.shape)
+    
     train_more_data = normalize_image_data(train_more_data)
     train_data = train_data.reshape(-1, 1, 21, 2)
     test_data = test_data.reshape(-1, 1, 21, 2)
