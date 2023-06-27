@@ -3,7 +3,7 @@ import os
 import numpy as np
 from PIL import Image
 import cv2
-from hand_tracking_module import handTracker, CNN
+from ASLWebsite.hand_tracking_module import handTracker, CNN
 import random
 import torch
 import torch.nn as nn

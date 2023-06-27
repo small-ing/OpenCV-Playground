@@ -39,6 +39,8 @@ base_url = get_base_url(port)
 app = Flask(__name__)
 # OpenCV Webcam
 cap = cv2.VideoCapture(0)
+# Hand Tracking Module
+tracker = handTracker(asl=True)
 
 # Home Page
 @app.route(f"{base_url}")
@@ -61,7 +63,10 @@ def bio():
 def demo():
     global switch, cap
     if request.method == 'POST':
-        if  request.form.get('stop') == 'Start or Stop Video':
+        print(request.method)
+        print(request.form)
+        if request.form.get('stop') == 'Start or Stop Video':
+            print("Flipping switch")
             if(switch==1):
                 switch=0
                 cap.release()
@@ -82,26 +87,26 @@ def gen_frames():
     '''
     Generates frames from camera
     '''
-    tracker = handTracker(asl=True)
     while True:
         try:
             success, image = cap.read()
-            if success:
-                image = tracker.hands_finder(image)
-                letter=tracker.estimate_letter()
-                print(letter)
-                tracker.letter_display(image,letter=letter)
-        
-                try:
-                    ret, buffer = cv2.imencode('.jpg', image)
-                    frame = buffer.tobytes()
-                    yield (b'--frame\r\n'
-                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-                except Exception as e:
-                    pass
+            
         except:
             print("Camera not found")
             break
+        
+        image = tracker.hands_finder(image)
+        lmList = tracker.position_finder(image)
+        letter = tracker.estimate_letter()
+        image = tracker.letter_display(image,letter=letter)
+    
+        try:
+            ret, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        except Exception as e:
+            pass
 
 
 
