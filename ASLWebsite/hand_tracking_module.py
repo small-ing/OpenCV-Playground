@@ -69,6 +69,7 @@ class handTracker():
         cv2.putText(image, letter[2], (x+12,y+45), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(image, letter[3], (x+12,y+65), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(image, letter[4], (x+12,y+85), font, 0.5, (255,255,255), 2, cv2.LINE_AA)
+        return image
 
     def estimate_letter(self):
         alphabet = "abcdefghiklmnopqrstuvwxy"

@@ -1,5 +1,5 @@
-import hand_tracking_module as htm
-from hand_tracking_module import *
+import ASLWebsite.hand_tracking_module as htm
+from ASLWebsite.hand_tracking_module import *
 import data_translations as dt
 from data_translations import *
 import cv2
