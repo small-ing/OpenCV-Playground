@@ -2,8 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Res
 import json
 import os
 import cv2
+<<<<<<< Updated upstream
 from hand_tracking_module import handTracker
 from data_translations import CNN
+=======
+from hand_tracking_module import handTracker, CNN
+import hand_tracking_module as htm
+>>>>>>> Stashed changes
 
 def get_base_url(port:int) -> str:
     '''
@@ -30,7 +35,8 @@ def get_base_url(port:int) -> str:
 
 # to exit flask app
 # ctrl + c
-
+global switch, cap
+switch=1
 port = 5000
 base_url = get_base_url(port)
 
@@ -58,6 +64,22 @@ def bio():
 # Demo Project
 @app.route(f"{base_url}/demo/")
 def demo():
+<<<<<<< Updated upstream
+=======
+    global switch, cap
+    if request.method == 'POST':
+        if  request.form.get('stop') == 'Start or Stop Video':
+            if(switch==1):
+                switch=0
+                cap.release()
+                cv2.destroyAllWindows()
+            else:
+                cap = cv2.VideoCapture(0)
+                switch=1
+    
+    elif request.method == 'GET':
+        return render_template("demo.html")
+>>>>>>> Stashed changes
     return render_template("demo.html")
 
 @app.route(f"{base_url}/video_feed/")
@@ -75,10 +97,11 @@ def gen_frames():
             if success:
                 image = tracker.hands_finder(image)
                 letter=tracker.estimate_letter()
+                print(letter)
                 tracker.letter_display(image,letter=letter)
         
                 try:
-                    ret, buffer = cv2.imencode('.jpg', cv2.flip(image,1))
+                    ret, buffer = cv2.imencode('.jpg', image)
                     frame = buffer.tobytes()
                     yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

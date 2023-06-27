@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import torch
+import __main__, os
 
 class handTracker():
     def __init__(self, mode=False, maxHands=1, detectionCon=0.5,modelComplexity=1,trackCon=0.5,asl=False):
@@ -127,3 +128,5 @@ class CNN(torch.nn.Module):
         out = self.fc1(out)
         out = self.fc2(out)
         return out
+
+setattr(__main__, "CNN", CNN)
