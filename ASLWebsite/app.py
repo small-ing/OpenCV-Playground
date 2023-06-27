@@ -30,8 +30,9 @@ def get_base_url(port:int) -> str:
 
 # to exit flask app
 # ctrl + c
-global switch, cap
+global switch, cap, wireframe, tracker
 switch=1
+wireframe=True
 port = 5000
 base_url = get_base_url(port)
 
@@ -59,9 +60,9 @@ def bio():
     return render_template("bio.html")
 
 # Demo Project
-@app.route(f"{base_url}/demo/")
+@app.route(f"{base_url}/demo/", methods=['GET', 'POST'])
 def demo():
-    global switch, cap
+    global switch, cap, wireframe
     if request.method == 'POST':
         print(request.method)
         print(request.form)
@@ -74,6 +75,12 @@ def demo():
             else:
                 cap = cv2.VideoCapture(0)
                 switch=1
+        if request.form.get('wire') == 'Draw Wireframes':
+            print("Flipping wireframe")
+            if(wireframe==True):
+                wireframe=False
+            else:
+                wireframe=True
     
     elif request.method == 'GET':
         return render_template("demo.html")
@@ -87,6 +94,7 @@ def gen_frames():
     '''
     Generates frames from camera
     '''
+    global wireframe, cap, tracker
     while True:
         try:
             success, image = cap.read()
@@ -95,8 +103,8 @@ def gen_frames():
             print("Camera not found")
             break
         
-        image = tracker.hands_finder(image)
-        lmList = tracker.position_finder(image)
+        image = tracker.hands_finder(image, draw=wireframe)
+        lmList = tracker.position_finder(image, draw=wireframe)
         letter = tracker.estimate_letter()
         image = tracker.letter_display(image,letter=letter)
     
