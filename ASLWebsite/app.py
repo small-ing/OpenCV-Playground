@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Response
 import json
-import os, sys
+import os
 import cv2
-sys.path.append("../")
 from hand_tracking_module import handTracker
 from data_translations import CNN
 
@@ -46,13 +45,6 @@ def index():
     print("Loading Home Page...")
     return render_template("main.html")
 
-<<<<<<< Updated upstream
-@app.route(f"{base_url}/bio")
-def bio():
-    return render_template("bio.html")
-
-@app.route(f"{base_url}/demo")
-=======
 # Introduction Video + How to Use
 @app.route(f"{base_url}/intro/")
 def intro():
@@ -65,7 +57,6 @@ def bio():
 
 # Demo Project
 @app.route(f"{base_url}/demo/")
->>>>>>> Stashed changes
 def demo():
     return render_template("demo.html")
 
