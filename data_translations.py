@@ -5,8 +5,6 @@ from PIL import Image
 import cv2
 from hand_tracking_module import handTracker
 import random
-# import bulk_image_trainer as bit
-# from bulk_image_trainer import collect_train_files, collect_test_files
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -56,18 +54,12 @@ def collect_data(batch_size=24, offset=0):
 
 def normalize_data(data):
     tensor_return = torch.zeros(data.shape)
-    #print(tensor_return.shape)
     for i in range(len(data)): # ASL Letters iterated
-       # print(data[i].shape)
-        
         for j in range(1, 21): # 1-20 nodes iterated
             width = data[i][:][0].max() - data[i][:][0].min()
             height = data[i][:][1].max() - data[i][:][1].min()
-            #print(width)
-            #print(height)
             width, height = int(width), int(height)
             zero_node = data[i][0] # saves 0 node before changes
-            #print(zero_node)
             for k in range(2): # x/y iteration
                 if k == 0:
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / width
@@ -79,14 +71,12 @@ def normalize_data(data):
 
 def normalize_image_data(data):
     tensor_return = torch.zeros(data.shape)
-    # print(tensor_return.shape)
     for i in range(len(data)): # ASL Letters iterated
         for j in range(1, 21): # 1-20 nodes iterated
             width = data[i][:][0].max() - data[i][:][0].min()
             height = data[i][:][1].max() - data[i][:][1].min()
             width, height = int(width), int(height)
             zero_node = data[i][0] # saves 0 node before changes
-            # print(zero_node)
             for k in range(2): # x/y iteration
                 if k == 0:
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / width
@@ -115,7 +105,6 @@ def collect_train_files():
                     landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                     labels[j] = ord(i) - ord("A") + 1
                 else:
-                    #print("retrying")
                     fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
                     tracker.hands_finder(fileObject, False)
                     hand_landmarks = tracker.results.multi_hand_landmarks
@@ -235,7 +224,6 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
 def main():
     print("Starting...")
     start_time = time.time()
-    #print(start_time)
     train_data, train_labels = collect_data(24000)
     test_data, test_labels = collect_data(2400, 21600)
     print("Collected JSON Data")
