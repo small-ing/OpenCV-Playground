@@ -88,7 +88,7 @@ def normalize_image_data(data):
 
 def collect_train_files():
     landmarks = torch.zeros(80000, 21, 2)
-    labels = torch.zeros(80000)
+    labels = torch.zeros(87000)
     j = 0
     work = 0
     errors = 0
@@ -233,13 +233,11 @@ def main():
     print("There were ", errors, " errors in collecting the image data")
     print("It took ", (time.time() - bit_time)/60, " minutes to collect the image data")
     print("Collected Image Data")
-    print("normal now")
     temp = train_more_labels.view(-1)
     zero_index = len(temp.nonzero())
     train_more_labels = train_more_labels[:zero_index]
     train_more_labels = train_more_labels.long()
     train_more_data = train_more_data[:zero_index]
-    train_more_data = train_more_data.reshape(-1, 1, 21, 2)
     test_data, test_labels = collect_data(2400, 21600)
     test_more_data, test_more_labels = collect_test_files(train_more_data, train_more_labels)
     test_more_data = test_more_data
@@ -251,9 +249,11 @@ def main():
     train_data = normalize_data(train_data)
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
+    print(train_more_data.shape)
     train_more_data = normalize_image_data(train_more_data)
     train_data = train_data.reshape(-1, 1, 21, 2)
     test_data = test_data.reshape(-1, 1, 21, 2)
+    train_more_data = train_more_data.reshape(-1, 1, 21, 2)
     
     print("Successfully normalized data")
     
