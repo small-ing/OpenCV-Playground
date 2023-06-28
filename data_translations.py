@@ -10,6 +10,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.init
 import time
+from alive_progress import alive_bar
 
 
 #                0    1    2   3  4  5  6    7   8  9   10  11   12   13  14  15  16   17   18  19  20  21  22 23 24 25
@@ -93,18 +94,11 @@ def collect_train_files():
     work = 0
     errors = 0
     for i in "ABCDEFGHIKLMNOPQRSTUVWXY":
-        print("    Current Letter is " + i)
+        #print("    Current Letter is " + i)
         files = os.listdir("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i)
-        for file_name in files:
-            with Image.open("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i + "/" + file_name) as fileObject:
-                fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
-                tracker.hands_finder(fileObject, False)
-                hand_landmarks = tracker.results.multi_hand_landmarks
-                if hand_landmarks is not None:
-                    hand_landmarks = hand_landmarks[0]
-                    landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
-                    labels[j] = ord(i) - ord("A") + 1
-                else:
+        with alive_bar(len(files), title=i) as bar:
+            for file_name in files:
+                with Image.open("../../../Downloads/asl_images/asl_alphabet_train/asl_alphabet_train" + "/" + i + "/" + file_name) as fileObject:
                     fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
                     tracker.hands_finder(fileObject, False)
                     hand_landmarks = tracker.results.multi_hand_landmarks
@@ -112,9 +106,18 @@ def collect_train_files():
                         hand_landmarks = hand_landmarks[0]
                         landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
                         labels[j] = ord(i) - ord("A") + 1
-                        work += 1
                     else:
-                        errors += 1
+                        fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
+                        tracker.hands_finder(fileObject, False)
+                        hand_landmarks = tracker.results.multi_hand_landmarks
+                        if hand_landmarks is not None:
+                            hand_landmarks = hand_landmarks[0]
+                            landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
+                            labels[j] = ord(i) - ord("A") + 1
+                            work += 1
+                        else:
+                            errors += 1
+                bar()
             # print("iteration: " + str(j), "errors: " + str(errors))
             j += 1
     print("retrying helped with " + str(work) + " images")
@@ -143,29 +146,34 @@ class ImageDataset(torch.utils.data.Dataset):
 
 def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, test_labels):
     should_save = False
+    bar_it = 0
     for i in range(epochs):
-        for img, label in train_loader:
-            img = img.to(device)
-            img = img.to(torch.float)
-            label = label.to(device) 
-            pred = model(img)
-            loss = loss_fn(pred, label)
+        with alive_bar(len(train_loader)) as bar:
+            for img, label in train_loader:
+                img = img.to(device)
+                img = img.to(torch.float)
+                label = label.to(device) 
+                pred = model(img)
+                loss = loss_fn(pred, label)
 
-            optimizer.zero_grad()    
-            loss.backward()
-            optimizer.step()
-        test_images = test_images.to(torch.float).to(device)
-        pred = model(test_images)
-        digit = torch.argmax(pred, dim=1)
-        test_labels = test_labels.to(device)
-        acc = torch.sum(digit == test_labels)/len(test_labels)
-        if acc > 0.9 and loss < 0.15:
-            print("Good enough to save")
-            should_save = True
-            if acc > 0.98 and loss < 0.05:
-                print(f"Accuracy - {acc} and Loss - {loss} are ideal")
-                print("Model is Ideal, saving now...")
-                break
+                optimizer.zero_grad()    
+                loss.backward()
+                optimizer.step()
+                bar_it += 1
+                if bar_it % 2 == 0:
+                    bar()
+            test_images = test_images.to(torch.float).to(device)
+            pred = model(test_images)
+            digit = torch.argmax(pred, dim=1)
+            test_labels = test_labels.to(device)
+            acc = torch.sum(digit == test_labels)/len(test_labels)
+            if acc > 0.9 and loss < 0.15:
+                print("Good enough to save")
+                should_save = True
+                if acc > 0.98 and loss < 0.05:
+                    print(f"Accuracy - {acc} and Loss - {loss} are ideal")
+                    print("Model is Ideal, saving now...")
+                    break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
 
@@ -192,7 +200,6 @@ def main():
     test_more_data = test_more_data
     
     print("Successfully collected all data")
-    print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
     
     train_data = torch.from_numpy(train_data)
     train_data = normalize_data(train_data)
@@ -222,13 +229,14 @@ def main():
     print("Successfully converted to tensors")
     
     train_dataset = ImageDataset(train_data, train_labels)
+
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=130, shuffle=True, num_workers=2)
 
     print("Successfully created dataset")
     
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.0002, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=0.00015, weight_decay=1e-6)
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
@@ -236,8 +244,8 @@ def main():
     
     model.to(device)
     if train_model(model, train_loader, criteron, optimizer, 500, test_data, test_labels):
-        torch.save(model, "asl_cnn_model.pth")
-        torch.save(model.state_dict(), "asl_cnn_model_weights.pth")
+        torch.save(model, "asl_cnn_model2.pth")
+        torch.save(model.state_dict(), "asl_cnn_model_weights2.pth")
     print("Total Time Elapsed: ", (time.time() - start_time)/60, " minutes")
 
 
