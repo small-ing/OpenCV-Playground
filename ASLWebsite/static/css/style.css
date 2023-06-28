@@ -25,26 +25,24 @@ body {
 .h1,
 .h2,
 .h3,
-.h4,
 .h5,
 .h6,
 h1,
 h2,
 h3,
-h4,
 h5,
 h6 {
 	font-family: "Muli", sans-serif;
 	font-weight: 700;
 	line-height: 1.35;
 	margin-bottom: 0.5rem;
-	color: #212529;
+	color: #FFFFFF;
 }
 
 .h1,
 h1 {
-	font-size: 2.125rem;
-	line-height: 40px;
+	font-size: 3rem;
+	line-height: 50px;
 }
 
 .h2,
@@ -59,7 +57,8 @@ h3 {
 
 .h4,
 h4 {
-	font-size: 1.125rem;
+	font-size: 1.625rem;
+	color: #544cc4;
 }
 
 .h5,
@@ -190,7 +189,7 @@ img {
   BUTTONS STYLE
 ----------------=----*/
 .btn {
-	font-size: 0.6875rem;
+	font-size: 1.125rem;
 	font-weight: 700;
 	position: relative;
 	text-transform: uppercase;
@@ -285,8 +284,8 @@ img {
 .bg-primary,
 .btn-primary,
 .btn-white:hover {
-	background: #21c87a !important;
-	border-color: #21c87a !important;
+	background: #544cc4 !important;
+	border-color: #544cc4 !important;
 	color: #fff;
 }
 
@@ -339,11 +338,11 @@ img {
 }
 
 .bg-primary {
-	background: #21c87a !important;
+	background: #544cc4 !important;
 }
 
 a {
-	color: #21c87a;
+	color: #3f3897;
 }
 
 a:hover,

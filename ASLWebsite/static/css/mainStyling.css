@@ -42,3 +42,16 @@
   height: 150%;
 }
 
+.input {
+  animation: background-pan 3s linear infinite;
+  background-color: linear-gradient(
+    to right,
+    var(--purple),
+    var(--violet),
+    var(--pink),
+    var(--purple)
+  );
+  background-size: 200%;
+  -webkit-text-fill-color: rgb(0, 0, 0);
+  white-space: nowrap;
+}
