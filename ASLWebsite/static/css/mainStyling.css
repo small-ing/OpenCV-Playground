@@ -52,5 +52,6 @@
     var(--purple)
   );
   background-size: 200%;
+  -webkit-text-fill-color: transparent;
   white-space: nowrap;
 }
