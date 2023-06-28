@@ -65,20 +65,18 @@ class handTracker():
     def letter_display(self, image, letter="", x=25, y=50):
         font = cv2.FONT_HERSHEY_SIMPLEX
         # Using cv2.putText() method
-        cv2.rectangle(image, (x - 10, y - 50), (x + 250, y + 95), (0, 21, 21), cv2.FILLED)
-        cv2.rectangle(image, (x - 10, y - 50), (x + 250, y + 95), (30, 100, 100), 2)
+        cv2.rectangle(image, (1, y - 50), (x + 250, y + 60), (0, 21, 21), cv2.FILLED)
+        cv2.rectangle(image, (1, y - 50), (x + 250, y + 60), (30, 100, 100), 2)
         cv2.putText(image, "I think it's " + letter[0], (x, y - 25), font, 0.7, (150, 150, 150), 1, cv2.LINE_AA)
         cv2.putText(image, "But it could instead be:", (x, y), font, 0.6, (150, 150, 150), 1, cv2.LINE_AA)
         cv2.putText(image, letter[1], (x + 12, y + 25), font, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
         cv2.putText(image, letter[2], (x + 12, y + 45), font, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
-        cv2.putText(image, letter[3], (x + 12, y + 65), font, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
-        cv2.putText(image, letter[4], (x + 12, y + 85), font, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
         return image
 
     def estimate_letter(self):
         alphabet = "abcdefghiklmnopqrstuvwxy"
-        letters = torch.topk(self.asl_model(self.landmark_tensor), 5).indices.tolist()[0]
-        confidence = torch.topk(self.asl_model(self.landmark_tensor), 5).values.tolist()[0]
+        letters = torch.topk(self.asl_model(self.landmark_tensor), 3).indices.tolist()[0]
+        confidence = torch.topk(self.asl_model(self.landmark_tensor), 3).values.tolist()[0]
         letters = [alphabet[i] for i in letters]
         for i in range(len(letters)):
             letters[i] = letters[i] + " " + str(round(confidence[i]/10, 2)) + "%"
