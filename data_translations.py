@@ -1,8 +1,6 @@
 import json
 import os
 import numpy as np
-from PIL import Image
-import cv2
 from ASLWebsite.hand_tracking_module import CNN
 import random
 import torch
