@@ -112,10 +112,9 @@ class CNN(torch.nn.Module):
             torch.nn.Dropout(p=1 - keep_prob))
 
         # L4 FC 4x4x128 inputs -> 625 outputs
-        self.fc1 = torch.nn.Linear(1408, 625, bias=True)
-        torch.nn.init.xavier_uniform_(self.fc1.weight)
         self.layer4 = torch.nn.Sequential(
-            self.fc1,
+            torch.nn.Linear(1408, 625, bias=True),
+            torch.nn.Linear(625, 625, bias=True),
             torch.nn.Linear(625, 625, bias=True),
             torch.nn.ReLU(),
             torch.nn.Dropout(p=1 - keep_prob))
@@ -128,7 +127,7 @@ class CNN(torch.nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = out.view(out.size(0), -1)   # Flatten them for FC
-        out = self.fc1(out)
+        out = self.layer4(out)
         out = self.fc2(out)
         return out
 
