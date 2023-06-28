@@ -38,13 +38,13 @@ h6 {
 	font-weight: 700;
 	line-height: 1.35;
 	margin-bottom: 0.5rem;
-	color: #212529;
+	color: #FFFFFF;
 }
 
 .h1,
 h1 {
-	font-size: 2.125rem;
-	line-height: 40px;
+	font-size: 3rem;
+	line-height: 50px;
 }
 
 .h2,
@@ -285,8 +285,8 @@ img {
 .bg-primary,
 .btn-primary,
 .btn-white:hover {
-	background: #21c87a !important;
-	border-color: #21c87a !important;
+	background: #544cc4 !important;
+	border-color: #544cc4 !important;
 	color: #fff;
 }
 
@@ -339,7 +339,7 @@ img {
 }
 
 .bg-primary {
-	background: #21c87a !important;
+	background: #544cc4 !important;
 }
 
 a {
