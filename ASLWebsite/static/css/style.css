@@ -25,13 +25,11 @@ body {
 .h1,
 .h2,
 .h3,
-.h4,
 .h5,
 .h6,
 h1,
 h2,
 h3,
-h4,
 h5,
 h6 {
 	font-family: "Muli", sans-serif;
@@ -59,7 +57,8 @@ h3 {
 
 .h4,
 h4 {
-	font-size: 1.125rem;
+	font-size: 1.625rem;
+	color: #544cc4;
 }
 
 .h5,
@@ -190,7 +189,7 @@ img {
   BUTTONS STYLE
 ----------------=----*/
 .btn {
-	font-size: 0.6875rem;
+	font-size: 1.125rem;
 	font-weight: 700;
 	position: relative;
 	text-transform: uppercase;
