@@ -80,7 +80,7 @@ class handTracker():
         confidence = torch.topk(self.asl_model(self.landmark_tensor), 5).values.tolist()[0]
         letters = [alphabet[i] for i in letters]
         for i in range(len(letters)):
-            letters[i] = letters[i] + " " + str(round(confidence[i], 2)) + "%"
+            letters[i] = letters[i] + " " + str(round(confidence[i]/10, 2)) + "%"
         return letters
 
 class CNN(torch.nn.Module):
