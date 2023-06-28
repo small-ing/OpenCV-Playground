@@ -53,6 +53,6 @@
   );
   background-size: 200%;
   background-color: transparent;
-  -webkit-text-fill-color: white;
+  -webkit-text-fill-color: rgb(0, 0, 0);
   white-space: nowrap;
 }
