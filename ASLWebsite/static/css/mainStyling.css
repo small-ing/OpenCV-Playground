@@ -1,13 +1,28 @@
 
 .introduction {
-
+      padding: 10px;
     text-align:center
+}
+.exPlain {
+ 
+ background-image:url("https://images.pexels.com/photos/1291515/pexels-photo-1291515.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500");
+  max-width: 25%;
+ max-height: 25%;
+ background-position: center;
+ background-repeat: no-repeat;
+ background-size: cover;
+ position: relative;
+ text-align: center;
+ top: 50%;
+ left: 50%;
+ transform: translate(0%, 0%);
+ color: rgb(255, 255, 255);
 }
 
 
 .topnav {
   overflow: hidden;
-  background-color: #486145;
+  background-color: #181818;
 }
 
 .topnav a {

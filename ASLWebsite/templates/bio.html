@@ -2,77 +2,89 @@
 
 <head>
   <title>Bootstrap demo</title>    
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="../static/css/mainStyling.css">
-</head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script></head>
 <style>
-body {
-  background-color: #edece8; /* Replace with the desired background color */
-}
+  body {
+    background-color: #edece8; /* Replace with the desired background color */
+  }
 </style>
 <style>
-.card-body-top {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  background-color: #9096ad; /* Replace with the desired background color */
-}
+  .card-body-top {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: #9096ad; /* Replace with the desired background color */
+  }
 </style>
 <style>
-.card-body-bottom {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-  background-color: #9096ad; /* Replace with the desired background color */
-  margin-top: -1px;
-}
+  .card-body-bottom {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: #9096ad; /* Replace with the desired background color */
+    margin-top: -1px;
+  }
 </style>
 <style>
-.nav-links {
-  display: flex;
-  justify-content: right;
-  align-items: center;
-}
-
-.nav-links .separator {
-  margin: 2.5px; /* Adjust the spacing around the separator */
-  color: gray; /* Separator color */
-  font-size: 1rem; /* Adjust the separator size */
-  line-height: 1;
-  display: flex;
-  align-items: center;
-}
+  .nav-links {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+  
+  .nav-links .separator {
+    margin: 2.5px; /* Adjust the spacing around the separator */
+    color: gray; /* Separator color */
+    font-size: 1rem; /* Adjust the separator size */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+  }
 </style>
 <style>
-    .darkgray {
-      background-color: #333333;
-      color: #ffffff;
-    }
+  .darkgray {
+    background-color: #333333;
+    color: #ffffff;
+  }
 </style>
 <style>
-    .darkergray {
-      background-color: #111111;
-      color: #ffffff;
-    }
+  .darkergray {
+    background-color: #111111;
+    color: #ffffff;
+  }
 </style>
+<link rel="stylesheet" href="../static/css/mainStyling.css">
 <body>
   <!-- NAVIGATION MENU -->
-<div class="darkergray nav-links topnav">
-  <a href="/">Home</a>
-  <span class="separator">|</span>
-  <a href="/bio">About</a>
-  <span class="separator">|</span>
-  <a href="/intro">How It Works</a>
-  <span class="separator">|</span>
-  <a href="/demo">ASL Translator</a>
-</div>
-</body>
+  <nav class="navbar navbar-inverse topnav">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="http://ai-camp.org">
+          <img src="../static/assets/TT_Logo.png">
+        </a>
+      </div>
+      
+      <div class="darkergray nav-links topnav" id='myNavbar'>
+        <a href="/">Home</a>
+        <span class="separator">|</span>
+        <a href="/bio">About</a>
+        <span class="separator">|</span>
+        <a href="/intro">How It Works</a>
+        <span class="separator">|</span>
+        <a href="/demo">ASL Translator</a>
+      </div>
+    
+    </div>
+  </nav>
+    
 <!-- Header -->
-<header class="darkgray text-center py-5 mb-4">
+<header class="bg-primary text-center py-5 mb-4">
   <div class="container">
-    <h1 class="fw-light">Meet the Team</h1>
+    <h1 class="fw-light text-white">Meet the Team</h1>
   </div>
 </header>
 
@@ -82,10 +94,10 @@ body {
     <!-- Team Member 1: Travis -->
     <div class="col-xl-3 col-md-6 mb-4">
       <div class="card border-0 shadow">
-                <div class="card-body-top text-center">
+        <div class="card-body-top text-center">
           <h5 class="card-title mb-0">Travis Smalling</h5>
         </div>
-        <img src="../static/assets/bio_images/travis_placeholder_image.png" class="card-img-top" alt="..." style="width: 255px; height: 150px;">
+        <img src="../static/assets/bio_images/travis_image_landscape.png" class="card-img-top" alt="..." style="width: 255px; height: 150px;">
         <div class="card-body-bottom text-center">
           <h5 class="card-title mb-0">Instructor</h5>
           <div class="card-text text-black-50">Developer</div>
@@ -153,7 +165,7 @@ body {
         <img src="../static/assets/bio_images/william_image.jpg" class="card-img-top" alt="..." style="width: 255px; height: 150px;">
         <div class="card-body-bottom text-center">
           <h5 class="card-title mb-0">Team Member</h5>
-          <div class="card-text text-black-50">Video Developer</div>
+          <div class="card-text text-black-50">Web Developer</div>
         </div>
       </div>
     </div>
@@ -170,8 +182,9 @@ body {
         </div>
       </div>
     </div>
-  <!-- /.row -->
-
+    <!-- /.row -->
+    
+  </div>
+  <!-- /.container -->
 </div>
-<!-- /.container -->
-</div>
+</body>
