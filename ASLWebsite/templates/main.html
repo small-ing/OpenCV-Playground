@@ -39,11 +39,39 @@
       .row.content {height:auto;} 
     }
   </style>
+  <style>
+    .nav-links {
+      display: flex;
+      justify-content: right;
+      align-items: center;
+    }
+    
+    .nav-links .separator {
+      margin: 2.5px; /* Adjust the spacing around the separator */
+      color: gray; /* Separator color */
+      font-size: 1rem; /* Adjust the separator size */
+      line-height: 1;
+      display: flex;
+      align-items: center;
+    }
+    </style>
+    <style>
+        .darkgray {
+          background-color: #333333;
+          color: #ffffff;
+        }
+    </style>
+    <style>
+        .darkergray {
+          background-color: #111111;
+          color: #ffffff;
+        }
+    </style>
   <link rel="stylesheet" href="../static/css/mainStyling.css">
 </head>
 <body>
 
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-inverse topnav">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -55,17 +83,17 @@
         <img src="../static/assets/TT_Logo.png">
       </a>
     </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home</a></li>
-        <li><a href="/bio">About</a></li>
-        <li><a href="/intro">How It Works</a></li>
-        <li><a href="/demo">ASL Translator</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-      </ul>
+    
+    <div class="darkergray nav-links topnav" id='myNavbar'>
+      <a href="/">Home</a>
+      <span class="separator">|</span>
+      <a href="/bio">About</a>
+      <span class="separator">|</span>
+      <a href="/intro">How It Works</a>
+      <span class="separator">|</span>
+      <a href="/demo">ASL Translator</a>
     </div>
+  
   </div>
 </nav>
   
