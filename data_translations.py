@@ -56,9 +56,9 @@ def normalize_data(data):
     tensor_return = torch.zeros(data.shape)
     for i in range(len(data)): # ASL Letters iterated
         for j in range(1, 21): # 1-20 nodes iterated
-            width = data[i][:][0].max() - data[i][:][0].min()
-            height = data[i][:][1].max() - data[i][:][1].min()
-            width, height = int(width), int(height)
+            x, y = torch.split(data[i], 1, dim=1)
+            width = x.max() - x.min()
+            height = y.max() - y.min()
             zero_node = data[i][0] # saves 0 node before changes
             for k in range(2): # x/y iteration
                 if k == 0:
@@ -73,9 +73,9 @@ def normalize_image_data(data):
     tensor_return = torch.zeros(data.shape)
     for i in range(len(data)): # ASL Letters iterated
         for j in range(1, 21): # 1-20 nodes iterated
-            width = data[i][:][0].max() - data[i][:][0].min()
-            height = data[i][:][1].max() - data[i][:][1].min()
-            width, height = int(width), int(height)
+            x, y = torch.split(data[i], 1, dim=3)
+            width = x.max() - x.min()
+            height = y.max() - y.min()
             zero_node = data[i][0] # saves 0 node before changes
             for k in range(2): # x/y iteration
                 if k == 0:
