@@ -7,6 +7,7 @@ import numpy as np
 from ASLWebsite.hand_tracking_module import handTracker, CNN
 
 tracker = handTracker()
+alphabet = "ABCDEFGHIKLMNOPQRSTUVWXY"
 
 def collect_train_files():
     landmarks = torch.zeros(80000, 21, 2)
@@ -26,7 +27,7 @@ def collect_train_files():
                     if hand_landmarks is not None:
                         hand_landmarks = hand_landmarks[0]
                         landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
-                        labels[j] = ord(i) - ord("A") + 1
+                        labels[j] = alphabet.index(i)
                     else:
                         fileObject = cv2.cvtColor(np.array(fileObject), cv2.COLOR_BGR2RGB)
                         tracker.hands_finder(fileObject, False)
@@ -34,7 +35,7 @@ def collect_train_files():
                         if hand_landmarks is not None:
                             hand_landmarks = hand_landmarks[0]
                             landmarks[j] = torch.tensor([[lm.x, lm.y] for lm in hand_landmarks.landmark], dtype=torch.float32)
-                            labels[j] = ord(i) - ord("A") + 1
+                            labels[j] = alphabet.index(i)
                             work += 1
                         else:
                             errors += 1

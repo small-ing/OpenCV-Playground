@@ -109,8 +109,8 @@ class ImageDataset(torch.utils.data.Dataset):
 
 def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, test_labels):
     should_save = False
-    for i in range(epochs):
-        with alive_bar(len(train_loader)) as bar:
+    with alive_bar(epochs, title="Current Epochs") as bar:
+        for i in range(epochs):
             for img, label in train_loader:
                 img = img.to(device)
                 img = img.to(torch.float)
@@ -121,7 +121,6 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
                 optimizer.zero_grad()    
                 loss.backward()
                 optimizer.step()
-                bar()
             test_images = test_images.to(torch.float).to(device)
             pred = model(test_images)
             digit = torch.argmax(pred, dim=1)
@@ -134,7 +133,8 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
                     print(f"Accuracy - {acc} and Loss - {loss} are ideal")
                     print("Model is Ideal, saving now...")
                     break
-        print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
+            bar()
+            print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
 
 

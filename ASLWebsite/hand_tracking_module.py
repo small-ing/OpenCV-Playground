@@ -16,8 +16,8 @@ class handTracker():
 
         self.landmark_tensor = torch.zeros(1, 1, 21, 2)
         if asl:
-            self.asl_model = torch.load("asl_cnn_model_fincom.pth")
-            self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights_fincom.pth"))
+            self.asl_model = torch.load("asl_cnn_model_fin.pth")
+            self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights_fin.pth"))
             self.asl_model.eval()
         
     def hands_finder(self,image,draw=True):
@@ -33,8 +33,8 @@ class handTracker():
     
     def normalize_hand(self, data):
         tensor_return = torch.zeros(data.shape)
-        width = data[:][0].max() - data[:][0].min()
-        height = data[:][1].max() - data[:][1].min()
+        width = data[0][0][:][0].max() - data[0][0][:][0].min()
+        height = data[0][0][:][1].max() - data[0][0][:][1].min()
         width, height = int(width), int(height)
         zero_node = data[0][0][0] # saves 0 node before changes
         for j in range(1, 21): # 1-20 nodes iterated
