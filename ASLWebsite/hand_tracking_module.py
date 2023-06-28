@@ -33,8 +33,11 @@ class handTracker():
     
     def normalize_hand(self, data):
         tensor_return = torch.zeros(data.shape)
-        width = data[0][0][:][0].max() - data[0][0][:][0].min()
-        height = data[0][0][:][1].max() - data[0][0][:][1].min()
+        data_splice = torch.split(data, 1, dim=3)
+        x = data_splice[0]
+        y = data_splice[1]
+        width = x.max() - x.min()
+        height = y.max() - y.min()
         width, height = int(width), int(height)
         zero_node = data[0][0][0] # saves 0 node before changes
         for j in range(1, 21): # 1-20 nodes iterated

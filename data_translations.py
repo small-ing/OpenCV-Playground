@@ -147,17 +147,17 @@ def main():
     print("Collected JSON Data")
     bit_time = time.time()
     print("Collecting Image Data...")
-    train_more_data, train_more_labels, errors = collect_train_files()
-    print("There were ", errors, " errors in collecting the image data")
+    # train_more_data, train_more_labels, errors = collect_train_files()
+    # print("There were ", errors, " errors in collecting the image data")
     print("It took ", (time.time() - bit_time)/60, " minutes to collect the image data")
     print("Collected Image Data")
-    temp = train_more_labels.view(-1)
-    zero_index = len(temp.nonzero())
-    train_more_labels = train_more_labels[:zero_index]
-    train_more_labels = train_more_labels.long()
-    train_more_data = train_more_data[:zero_index]
-    test_more_data, test_more_labels = collect_test_files(train_more_data, train_more_labels)
-    test_more_data = test_more_data
+    # temp = train_more_labels.view(-1)
+    # zero_index = len(temp.nonzero())
+    # train_more_labels = train_more_labels[:zero_index]
+    # train_more_labels = train_more_labels.long()
+    # train_more_data = train_more_data[:zero_index]
+    # test_more_data, test_more_labels = collect_test_files(train_more_data, train_more_labels)
+    # test_more_data = test_more_data
     
     print("Successfully collected all data")
     
@@ -166,23 +166,23 @@ def main():
     test_data = torch.from_numpy(test_data)
     test_data = normalize_data(test_data)
     
-    train_more_data = normalize_image_data(train_more_data)
     train_data = train_data.reshape(-1, 1, 21, 2)
     test_data = test_data.reshape(-1, 1, 21, 2)
-    train_more_data = train_more_data.reshape(-1, 1, 21, 2)
+    # train_more_data = normalize_image_data(train_more_data)
+    # train_more_data = train_more_data.reshape(-1, 1, 21, 2)
     
     print("Successfully normalized data")
     
-    train_data = torch.cat((train_data, train_more_data), 0)
-    test_data = torch.cat((test_data, test_more_data), 0)
+    # train_data = torch.cat((train_data, train_more_data), 0)
+    # test_data = torch.cat((test_data, test_more_data), 0)
     
     train_labels = torch.from_numpy(train_labels)
     test_labels = torch.from_numpy(test_labels)
     train_labels = train_labels.long()
     test_labels = test_labels.long()
 
-    train_labels = torch.cat((train_labels, train_more_labels), 0)
-    test_labels = torch.cat((test_labels, test_more_labels), 0)
+    # train_labels = torch.cat((train_labels, train_more_labels), 0)
+    # test_labels = torch.cat((test_labels, test_more_labels), 0)
     
     train_data = train_data.float()
 
