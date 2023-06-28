@@ -65,9 +65,9 @@ class handTracker():
     def letter_display(self, image, letter="", x=25, y=50):
         font = cv2.FONT_HERSHEY_SIMPLEX
         # Using cv2.putText() method
-        cv2.rectangle(image, (1, y - 50), (x + 250, y + 60), (0, 21, 21), cv2.FILLED)
-        cv2.rectangle(image, (1, y - 50), (x + 250, y + 60), (30, 100, 100), 2)
-        cv2.putText(image, "I think it's " + letter[0], (x, y - 25), font, 0.7, (150, 150, 150), 1, cv2.LINE_AA)
+        cv2.rectangle(image, (1, y - 50), (x + 250, y + 60), (171, 68, 14), cv2.FILLED)
+        cv2.rectangle(image, (1, y - 50), (x + 250, y + 60), (59,1,1), 2)
+        cv2.putText(image, "I think it's " + letter[0], (x, y - 25), font, 0.7, (255,255,255), 1, cv2.LINE_AA)
         cv2.putText(image, "But it could instead be:", (x, y), font, 0.6, (150, 150, 150), 1, cv2.LINE_AA)
         cv2.putText(image, letter[1], (x + 12, y + 25), font, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
         cv2.putText(image, letter[2], (x + 12, y + 45), font, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
