@@ -43,5 +43,6 @@
 }
 
 .input {
-
+  -webkit-text-fill-color: #ddd;
+  background-image: linear-gradient(to right, red, blue);
 }
