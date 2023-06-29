@@ -84,6 +84,7 @@ def normalize_image_data(data):
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / height
             tensor_return[i][0][0] = 0 # reset zero node x
             tensor_return[i][0][1] = 0 # reset zero node y
+            tensor_return = tensor_return * 100
     return tensor_return
         
 def collect_test_files(train_landmarks, train_labels, num_files=100):
@@ -110,29 +111,31 @@ class ImageDataset(torch.utils.data.Dataset):
 def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, test_labels):
     should_save = False
     for i in range(epochs):
-        for img, label in train_loader:
-            img = img.to(device)
-            img = img.to(torch.float)
-            label = label.to(device) 
-            pred = model(img)
-            loss = loss_fn(pred, label)
+        with alive_bar(len(train_loader), title=i) as bar:
+            for img, label in train_loader:
+                img = img.to(device)
+                img = img.to(torch.float)
+                label = label.to(device) 
+                pred = model(img)
+                bar()
 
-            optimizer.zero_grad()    
-            loss.backward()
-            optimizer.step()
-        test_images = test_images.to(torch.float).to(device)
-        pred = model(test_images)
-        digit = torch.argmax(pred, dim=1)
-        test_labels = test_labels.to(device)
-        acc = torch.sum(digit == test_labels)/len(test_labels)
-        if acc > 0.9 and loss < 0.18:
-            if not should_save:
-                print("Good enough to save")
-            should_save = True
-            if acc > 0.94 and loss < 0.1:
-                print(f"Accuracy - {acc} and Loss - {loss} are ideal")
-                print("Model is Ideal, saving now...")
-                break
+                loss = loss_fn(pred, label)
+                optimizer.zero_grad()    
+                loss.backward()
+                optimizer.step()
+            test_images = test_images.to(torch.float).to(device)
+            pred = model(test_images)
+            digit = torch.argmax(pred, dim=1)
+            test_labels = test_labels.to(device)
+            acc = torch.sum(digit == test_labels)/len(test_labels)
+            if acc > 0.88 and loss < 0.2:
+                if not should_save:
+                    print("Good enough to save")
+                should_save = True
+                if acc > 0.90 and loss < 0.11:
+                    print(f"Accuracy - {acc} and Loss - {loss} are ideal")
+                    print("Model is Ideal, saving now...")
+                    break
         print(f"Epoch {i+1}: loss: {loss}, test accuracy: {acc}")
     return should_save
 
@@ -142,7 +145,7 @@ def main():
     print("Starting...")
     start_time = time.time()
     train_data, train_labels = collect_data(24000)
-    test_data, test_labels = collect_data(4800, 16800)
+    test_data, test_labels = collect_data(3600, 16800)
     print("Collected JSON Data")
     # train_more_data, train_more_labels, errors = collect_train_files()
     # print("There were ", errors, " errors in collecting the image data")
@@ -193,14 +196,14 @@ def main():
     
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.00011, weight_decay=1e-6)
+    optimizer = optim.Adam(model.parameters(), lr=0.00015, weight_decay=1e-6)
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
     print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
     
     model.to(device)
-    if train_model(model, train_loader, criteron, optimizer, 250, test_data, test_labels):
+    if train_model(model, train_loader, criteron, optimizer, 150, test_data, test_labels):
         torch.save(model, "asl_model.pth")
         torch.save(model.state_dict(), "asl_weights.pth")
     print("Total Time Elapsed: ", (time.time() - start_time)/60, " minutes")
