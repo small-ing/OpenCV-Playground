@@ -29,6 +29,7 @@
           }
           body{
             background-color: #121212;
+            color: #fff;
           }
       </style>
   </head>
@@ -62,7 +63,7 @@
               <h2 class="mt-5 text-white">Your ASL Translator</h2>
         <form method="post" action="{{ url_for('demo') }}">
         <input type="submit" value="Start or Stop Video" name="stop" class="input"/>
-        <input type="submit" value="Draw Wireframes" name="wire" class="input"/>
+        <input type="submit" value="Toggle Wireframe" name="wire" class="input"/>
         </form>
               <img src="{{ url_for('video_feed') }}" height="80%">
           </div>

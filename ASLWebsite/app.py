@@ -73,7 +73,7 @@ def demo():
             else:
                 cap = cv2.VideoCapture(0)
                 switch=1
-        if request.form.get('wire') == 'Draw Wireframes':
+        if request.form.get('wire') == 'Toggle Wireframe':
             print("Flipping wireframe")
             if(wireframe==True):
                 wireframe=False
