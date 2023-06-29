@@ -33,9 +33,10 @@ class handTracker():
     
     def normalize_hand(self, data):
         tensor_return = torch.zeros(data.shape)
-        x, y = torch.split(data, 1, dim=3)
-        width = x.max() - x.min()
-        height = y.max() - y.min()
+        # x, y = torch.split(data, 1, dim=3)
+        # width = x.max() - x.min()
+        # height = y.max() - y.min()
+        width, height = 640, 360
         zero_node = data[0][0][0] # saves 0 node before changes
         for j in range(1, 21): # 1-20 nodes iterated
             joint = data[0][0][j]
@@ -43,6 +44,7 @@ class handTracker():
             tensor_return[0][0][j][1] = (zero_node[1] - joint[1]) / height
         tensor_return[0][0][0][0] = 0 # reset zero node x
         tensor_return[0][0][0][1] = 0 # reset zero node y
+        tensor_return = tensor_return * 100
         return tensor_return
 
     def position_finder(self, image, handNo=0, draw=True):
@@ -79,7 +81,7 @@ class handTracker():
         confidence = torch.topk(self.asl_model(self.landmark_tensor), 3).values.tolist()[0]
         letters = [alphabet[i] for i in letters]
         for i in range(len(letters)):
-            letters[i] = letters[i] + " " + str(round(confidence[i]/10, 2)) + "%"
+            letters[i] = letters[i] + " " + str(round(confidence[i], 2)) + "%"
         return letters
 
 class CNN(torch.nn.Module):
@@ -106,15 +108,17 @@ class CNN(torch.nn.Module):
         # Conv ->(?, 5, 0, 128)
         # Pool ->(?, 2, 0, 128)
         self.layer3 = torch.nn.Sequential(
-            torch.nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+            torch.nn.Conv2d(128, 256, kernel_size=2, stride=1, padding=1),
             torch.nn.ReLU(),
-            #torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=1),
+            torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
             torch.nn.Dropout(p=1 - keep_prob))
 
         # L4 FC 4x4x128 inputs -> 625 outputs
         self.layer4 = torch.nn.Sequential(
-            torch.nn.Linear(1408, 625, bias=True),
+            torch.nn.Linear(1536, 625, bias=True),
+            torch.nn.ReLU(),
             torch.nn.Linear(625, 625, bias=True),
+            torch.nn.ReLU(),
             torch.nn.Linear(625, 625, bias=True),
             torch.nn.ReLU(),
             torch.nn.Dropout(p=1 - keep_prob))
