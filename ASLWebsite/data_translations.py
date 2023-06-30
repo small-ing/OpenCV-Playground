@@ -197,14 +197,14 @@ def main():
     
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.00005)
+    optimizer = optim.Adam(model.parameters(), lr=0.0001)
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
     print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
     
     model.to(device)
-    if train_model(model, train_loader, criteron, optimizer, 600, test_data, test_labels):
+    if train_model(model, train_loader, criteron, optimizer, 400, test_data, test_labels):
         torch.save(model, "asl_model_over.pth")
         torch.save(model.state_dict(), "asl_weights_over.pth")
     print("Total Time Elapsed: ", (time.time() - start_time)/60, " minutes")
