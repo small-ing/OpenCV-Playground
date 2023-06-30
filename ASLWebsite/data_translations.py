@@ -56,9 +56,10 @@ def normalize_data(data):
     tensor_return = torch.zeros(data.shape)
     for i in range(len(data)): # ASL Letters iterated
         for j in range(1, 21): # 1-20 nodes iterated
-            x, y = torch.split(data[i], 1, dim=1)
-            width = x.max() - x.min()
-            height = y.max() - y.min()
+            # x, y = torch.split(data[i], 1, dim=1)
+            # width = x.max() - x.min()
+            # height = y.max() - y.min()
+            width, height = 320, 240
             zero_node = data[i][0] # saves 0 node before changes
             for k in range(2): # x/y iteration
                 if k == 0:
@@ -84,7 +85,7 @@ def normalize_image_data(data):
                     tensor_return[i][j][k] = (zero_node[k] - data[i][j][k]) / height
             tensor_return[i][0][0] = 0 # reset zero node x
             tensor_return[i][0][1] = 0 # reset zero node y
-            tensor_return = tensor_return * 100
+            tensor_return = tensor_return
     return tensor_return
         
 def collect_test_files(train_landmarks, train_labels, num_files=100):
@@ -128,11 +129,11 @@ def train_model(model, train_loader, loss_fn, optimizer, epochs, test_images, te
             digit = torch.argmax(pred, dim=1)
             test_labels = test_labels.to(device)
             acc = torch.sum(digit == test_labels)/len(test_labels)
-            if acc > 0.88 and loss < 0.2:
+            if acc > 0.92 and loss < 0.2:
                 if not should_save:
                     print("Good enough to save")
                 should_save = True
-                if acc > 0.90 and loss < 0.11:
+                if acc > 0.95 and loss < 0.10:
                     print(f"Accuracy - {acc} and Loss - {loss} are ideal")
                     print("Model is Ideal, saving now...")
                     break
@@ -145,7 +146,7 @@ def main():
     print("Starting...")
     start_time = time.time()
     train_data, train_labels = collect_data(24000)
-    test_data, test_labels = collect_data(3600, 16800)
+    test_data, test_labels = collect_data(2400, 21600)
     print("Collected JSON Data")
     # train_more_data, train_more_labels, errors = collect_train_files()
     # print("There were ", errors, " errors in collecting the image data")
@@ -196,16 +197,16 @@ def main():
     
     model = CNN()
 
-    optimizer = optim.Adam(model.parameters(), lr=0.00015, weight_decay=1e-6)
+    optimizer = optim.Adam(model.parameters(), lr=0.00005)
     criteron = nn.CrossEntropyLoss()
 
     print("Successfully created model")
     print("Time Elapsed: ", (time.time() - start_time)/60, " minutes")
     
     model.to(device)
-    if train_model(model, train_loader, criteron, optimizer, 150, test_data, test_labels):
-        torch.save(model, "asl_model.pth")
-        torch.save(model.state_dict(), "asl_weights.pth")
+    if train_model(model, train_loader, criteron, optimizer, 600, test_data, test_labels):
+        torch.save(model, "asl_model_over.pth")
+        torch.save(model.state_dict(), "asl_weights_over.pth")
     print("Total Time Elapsed: ", (time.time() - start_time)/60, " minutes")
 
 

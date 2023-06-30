@@ -16,8 +16,8 @@ class handTracker():
 
         self.landmark_tensor = torch.zeros(1, 1, 21, 2)
         if asl:
-            self.asl_model = torch.load("asl_cnn_model_fin.pth")
-            self.asl_model.load_state_dict(torch.load("asl_cnn_model_weights_fin.pth"))
+            self.asl_model = torch.load("asl_model_over.pth")
+            self.asl_model.load_state_dict(torch.load("asl_weights_over.pth"))
             self.asl_model.eval()
         
     def hands_finder(self,image,draw=True):
@@ -44,7 +44,7 @@ class handTracker():
             tensor_return[0][0][j][1] = (zero_node[1] - joint[1]) / height
         tensor_return[0][0][0][0] = 0 # reset zero node x
         tensor_return[0][0][0][1] = 0 # reset zero node y
-        tensor_return = tensor_return * 100
+        tensor_return = tensor_return
         return tensor_return
 
     def position_finder(self, image, handNo=0, draw=True):
@@ -77,11 +77,11 @@ class handTracker():
 
     def estimate_letter(self):
         alphabet = "abcdefghiklmnopqrstuvwxy"
-        letters = torch.topk(self.asl_model(self.landmark_tensor), 3).indices.tolist()[0]
-        confidence = torch.topk(self.asl_model(self.landmark_tensor), 3).values.tolist()[0]
+        letters = torch.topk(self.asl_model(self.landmark_tensor), 4).indices.tolist()[0]
+        confidence = torch.topk(self.asl_model(self.landmark_tensor), 4).values.tolist()[0]
         letters = [alphabet[i] for i in letters]
         for i in range(len(letters)):
-            letters[i] = letters[i] + " " + str(round(confidence[i], 2)) + "%"
+            letters[i] = letters[i] + " ~ " + str(round(confidence[i] + 10, 2)) + "%"
         return letters
 
 class CNN(torch.nn.Module):
